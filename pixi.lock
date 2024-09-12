@@ -611,7 +611,7 @@ packages:
   name: allele-discovery
   version: 0.1.0
   path: .
-  sha256: 20fa53e9184c546589ba126e64b6f2daecb5bc6b608528fba74c6cc0bb84bf24
+  sha256: dd93c89c683e01f3130cf8938f22e8012161239a3bd1ef7aa65378efe8e56be2
   requires_dist:
   - biopython>=1.83
   - loguru>=0.7.2

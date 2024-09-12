@@ -1,16 +1,14 @@
 import argparse
+import subprocess
 import sys
 from pathlib import Path
 
 from loguru import logger
 
-HERE = Path(__file__).parent
+HERE = Path(__file__).parent.parent
 
 
 def parse_command_line_args() -> argparse.Namespace:
-    """
-    TODO
-    """
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommands")
 
@@ -64,6 +62,7 @@ def parse_command_line_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    # pull in provided command line args
     args = parse_command_line_args()
 
     # set up logger based on the requested verbosity
@@ -80,19 +79,28 @@ def main() -> None:
     logger.remove()
     logger.add(sys.stderr, colorize=True, level=level)
 
+    # construct the command based on whether a dry run was requested
     command = (
         f"snakemake --snakefile {args.snakefile} --configfile {args.config} --cores {args.cores}"
         if not args.dry_run
         else f"snakemake --snakefile {args.snakefile} --configfile {args.config} --cores {args.cores} --dry-run"
     )
 
+    # log out the command if in debug mode
     logger.debug("Launching pipeline with the following snakemake command:")
     logger.debug(command)
-
     command_list = command.split(" ")
     logger.debug(f"Command prepared for subprocessing: {command_list}")
 
-    logger.success("Pipeline successful. Goodbye.")
+    # run the pipeline
+    try:
+        subprocess.run(command_list, check=True, text=True, capture_output=False)  # noqa: S603
+    except subprocess.CalledProcessError as e:
+        logger.error(
+            f"Pipeline failed with the following error.\n\n```\n{e}\n```\n\nAborting.",
+        )
+    else:
+        logger.success("Pipeline successful. Goodbye.")
 
 
 if __name__ == "__main__":
