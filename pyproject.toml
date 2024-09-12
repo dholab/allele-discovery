@@ -5,9 +5,11 @@ authors = [
 ]
 dependencies = [
     "biopython>=1.83",
+    "loguru>=0.7.2",
     "pandas>=2.0.3",
     "pysam>=0.22.1",
-    "snakemake",
+    "snakemake>=7.32.4,<9",
+    "pulp==2.7.0",
 ]
 description = "A Snakemake workflow for discovering novel alleles with PacBio HiFi reads"
 name = "allele-discovery"
@@ -43,7 +45,9 @@ dev-dependencies = [
     "mamba>=0.11.3",
     "marimo[sql]>=0.8.14",
     "polars>=1.7.0",
+    "pytest>=8.3.3",
     "ruff",
+    "tox>=4.18.1",
 ]
 compile-bytecode = true
 
