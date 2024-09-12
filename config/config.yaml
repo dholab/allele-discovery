@@ -2,11 +2,11 @@ params:
   input_dir: 'data'
 
 pbaa:
-  guide_fasta: '/ref/24923-vsearch-07-mhc-I.fasta'
+  guide_fasta: 'ref/24923-vsearch-07-mhc-I.fasta'
   mapping_reference_fasta: 'ref/mamu_orientation_allele.fasta'
 
 classify:
   gdna_reference_fasta: 'ref/papio_mhc.gdna.fasta'
   cdna_reference_fasta: 'ref/papio_mhc.cdna.fasta'
-  hla_mrna_reference: '/ref/HLA-A-mRNA.fasta'
-  hla_cds_annotation: '/ref/HLA-A-mRNA-annotation.txt'
+  hla_mrna_reference: 'ref/HLA-A-mRNA.fasta'
+  hla_cds_annotation: 'ref/HLA-A-mRNA-annotation.txt'

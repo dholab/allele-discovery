@@ -174,3 +174,8 @@ fastq/
 fastqs/
 ._*
 uv.lock
+.snakemake
+logs
+.DS_Store
+._*
+
