@@ -10,7 +10,8 @@ configfile: "config/config.yaml"
 
 ## FILES ##
 
-ccs_fastq, = glob_wildcards('data/{id}.fastq.gz')
+input_dir = config["params"]["input_dir"]
+ccs_fastq, = glob_wildcards(f'{input_dir}/{{id}}.fastq.gz')
 
 ## RULES ##
 
@@ -33,7 +34,7 @@ rule map_ccs_to_reference:
 	Map CCS HiFi to a set of reference sequences using minimap2 and output in SAM format.
 	'''
 	input:
-		'data/{id}.fastq.gz',
+		f'{input_dir}/{{id}}.fastq.gz',
 		config['pbaa']['mapping_reference_fasta']
 	output:
 		temp('results/03-mapped/{id}.sam'),
