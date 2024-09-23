@@ -14,6 +14,7 @@ with open(snakemake.output[0], "wb") as f:
             read.cigartuples
             and read.cigartuples[0][0] == 4
             and read.cigartuples[-1][0] == 4
+            and len(read.query_alignment_sequence) >= 2600
         ):
             quality = "".join(
                 map(lambda x: chr(x + 33), read.query_alignment_qualities),
