@@ -53,7 +53,7 @@ rule map_ccs_to_reference:
 		-t {threads} \
 		{input[1]} \
 		{input[0]} \
-		-ax map-hifi --secondary=no \
+		-ax map-hifi --secondary=no --end-bonus 10 \
 		> {output[0]} \
 		2> {output[1]}')
 
