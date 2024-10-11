@@ -114,12 +114,14 @@ rule run_pbaa:
 		'logs/05_run_pbaa/run_pbaa_{id}.log'
 	params:
 		pbaa_output_basename = '{id}'
-	threads: 1
+	threads: 4
 	run:
 		shell('/miniconda2/bin/pbaa cluster \
 		--min-read-qv 30 \
 		--max-reads-per-guide 1000 \
 		--max-alignments-per-read 2000 \
+		--num-threads {threads} \
+		--skip-chimera-detection \
 		{input[0]} \
 		{input[1]} \
 		results/06-pbaa/{params.pbaa_output_basename} \
