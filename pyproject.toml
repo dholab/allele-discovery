@@ -68,4 +68,4 @@ dev-dependencies = [
 compile-bytecode = true
 
 [project.scripts]
-"alleled" = "scripts.__main__:main"
+"alleled" = "bin.__main__:main"
