@@ -222,8 +222,8 @@ process MAP_CSS_TO_REF {
 
     tag "${id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 3
 
@@ -244,8 +244,8 @@ process EXTRACT_SOFT_CLIPPED_CONTIGS {
 
     tag "${id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 1
 
@@ -266,8 +266,8 @@ process GZIP_COMPRESS_TRIMMED_FASTQ {
 
     tag "${id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 1
 
@@ -289,8 +289,8 @@ process INDEX_FASTQ {
     tag "${id}"
     publishDir "${params.results}/trimmed", mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 1
 
@@ -312,8 +312,8 @@ process RUN_PBAA {
     tag "${id}"
     publishDir "${params.results}/pbaa", mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 3
 
@@ -341,8 +341,8 @@ process CLUSTER_PER_SAMPLE {
 
     tag "${id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 1
 
@@ -367,8 +367,8 @@ process RENAME_CLUSTERS {
 
     tag "${id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 1
 
@@ -392,8 +392,8 @@ process RENAME_CLUSTERS {
 
 process MERGE_PER_ANIMAL_CLUSTERS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path cluster_fastas
@@ -410,8 +410,8 @@ process MERGE_PER_ANIMAL_CLUSTERS {
 
 process SHARED_ANIMALS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 1
 
@@ -448,8 +448,8 @@ process SHARED_ANIMALS {
 
 process RENAME_PUTATIVE_ALLELE_CLISTERS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 1
 
@@ -478,8 +478,8 @@ process RENAME_PUTATIVE_ALLELE_CLISTERS {
 
 process MAP_SHARED_CLUSTERS_TO_FULL_LENGTH_GDNA {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 3
 
@@ -504,8 +504,8 @@ process MAP_SHARED_CLUSTERS_TO_FULL_LENGTH_GDNA {
 
 process FILTER_EXACT_GDNA_MATCHES {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path(all_mappings)
@@ -535,8 +535,8 @@ process FILTER_EXACT_GDNA_MATCHES {
 
 process MAP_SHARED_CLUSTERS_TO_CDNA {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path no_gdna_match
@@ -578,8 +578,8 @@ process MAP_SHARED_CLUSTERS_TO_CDNA {
 
 process MAP_SHARED_CLUSTERS_TO_CDNA {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path cdna_identical
@@ -598,8 +598,8 @@ process RENAME_CDNA_MATCHED_FASTA {
 
     publishDir "${params.results}/cdna-identical", mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path no_gdna_match
@@ -639,8 +639,8 @@ process RENAME_CDNA_MATCHED_FASTA {
 
 process PRELIMINARY_EXONERATE {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path hla_mrna_ref
@@ -668,8 +668,8 @@ process PRELIMINARY_EXONERATE {
 
 process PROCESS_PRELIM_GFF {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path gff
@@ -689,8 +689,8 @@ process PROCESS_PRELIM_GFF {
 
 process PRELIM_EXONERATE_MERGE_CDS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path processed_gff
@@ -709,8 +709,8 @@ process TRIM_ANNOTATIONS {
 
     publishDir "${params.results}/cdna-identical", mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path prelim_annotations
@@ -729,8 +729,8 @@ process EXTRACT_NOVEL_SEQUENCES {
 
     publishDir "${params.results}/novel", mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 3
 
@@ -750,8 +750,8 @@ process EXTRACT_NOVEL_SEQUENCES {
 
 process NOVEL_EXONERATE {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path hla_mrna_ref
@@ -778,8 +778,8 @@ process NOVEL_EXONERATE {
 
 process NOVEL_EXONERATE_PROCESS_GFFS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path mapped_gff
@@ -799,8 +799,8 @@ process NOVEL_EXONERATE_PROCESS_GFFS {
 
 process NOVEL_EXONERATE_MERGE_CDS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path processed_gff
@@ -819,8 +819,8 @@ process NOVEL_TRIM_ANNOTATIONS {
 
     publishDir "${params.results}/novel", mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
 
@@ -836,8 +836,8 @@ process NOVEL_TRIM_ANNOTATIONS {
 
 process MERGE_READS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path gdna_ref
@@ -856,8 +856,8 @@ process MERGE_READS {
 
 process CLUSTAL_ALIGN {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 8
 
@@ -884,8 +884,8 @@ process CLUSTAL_ALIGN {
 
 process PARSE_DISTANCES {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path distances
@@ -905,8 +905,8 @@ process PARSE_DISTANCES {
 
 process CREATE_GENOTYPING_FASTA {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path putative_alleles
@@ -926,8 +926,8 @@ process CREATE_GENOTYPING_FASTA {
 
 process GENOTYPE_CCS {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     each path(genotyping_fasta)
@@ -958,8 +958,8 @@ process GENOTYPE_CCS {
 
 process CREATE_GENOTYPING_CSV {
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path sam_files
@@ -978,8 +978,8 @@ process CREATE_GENOTYPING_PIVOT {
 
     publishDir "${params.results}/genotyping", mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
     path csv
