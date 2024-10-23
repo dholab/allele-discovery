@@ -84,21 +84,19 @@ process FASTQ_CONVERSION {
 process FAIDX {
 
     tag "${barcode}"
-    publishDir params.basecall_fastqs, mode: 'copy', overwrite: true
 
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
 	maxRetries 2
 
     input:
-    tuple val(barcode), path(fastq)
+    path fasta
 
     output:
-    tuple val(barcode), path(fastq), path("*.fai")
+    tuple path(fasta), path("${fasta}.fai")
 
     script:
-    index_name = file(fastq).getName()
     """
-    samtools faidx --fastq ${fastq}
+    samtools faidx ${fasta}
     """
 
 }

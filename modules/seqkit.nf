@@ -63,7 +63,6 @@ process AMPLICON_STATS {
   /* */
 
   tag "${barcode}"
-  publishDir params.complete_amplicons, mode: 'copy', overwrite: true
 
   errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
   maxRetries 2
@@ -91,7 +90,6 @@ process MERGE_BY_SAMPLE {
   /* */
 
   tag "${barcode}"
-  publishDir params.complete_amplicons, mode: 'copy', overwrite: true
 
   errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
   maxRetries 2
@@ -115,3 +113,30 @@ process MERGE_BY_SAMPLE {
 
 }
 
+process MERGE_ALL_ANIMALS {
+
+  /* */
+
+  tag "${barcode}"
+
+  errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+  maxRetries 2
+
+  cpus 4
+
+  input:
+  path "per_animal_clusters/*"
+
+  output:
+  tuple val(barcode), path("merged.fasta.gz")
+
+  script:
+  """
+  seqkit scat \
+  --find-only \
+  --threads ${task.cpus} \
+  per_animal_clusters/ \
+  | bgzip -o merged.fasta.gz
+  """
+
+}
