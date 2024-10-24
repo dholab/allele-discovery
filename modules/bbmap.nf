@@ -205,3 +205,26 @@ process FILTER_EXACT_GDNA_MATCHES {
 
 }
 
+process EXTRACT_NOVEL_SEQUENCES {
+
+    publishDir "${params.results}/novel", mode: 'copy', overwrite: true
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    cpus 3
+
+    input:
+    path no_gdna_match
+    path cdna_matches
+
+    output:
+    path "novel.fasta"
+
+    script:
+    """
+    mapPacBio.sh in=${no_gdna_match} ref=${cdna_matches} outu=novel.fasta subfilter=0
+    """
+
+}
+

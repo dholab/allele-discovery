@@ -1,3 +1,18 @@
+include {
+    PRELIMINARY_EXONERATE;
+    NOVEL_EXONERATE   
+    } from "../modules/exonerate"
+include {
+    PROCESS_PRELIM_GFF;
+    PRELIM_EXONERATE_MERGE_CDS;
+    NOVEL_EXONERATE_PROCESS_GFF;
+    NOVEL_EXONERATE_MERGE_CDS
+    } from "../modules/gff_processing"
+include {
+    TRIM_ANNOTATIONS;
+    NOVEL_TRIM_ANNOTATIONS
+    } from "../modules/trim_annotations"
+
 workflow ALLELE_ANNOTATION {
 
     take:
@@ -51,7 +66,5 @@ workflow ALLELE_ANNOTATION {
             NOVEL_EXONERATE_MERGE_CDS.out,
             ch_novel_seqs
         )
-
-    emit:
 
 }

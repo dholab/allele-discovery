@@ -37,5 +37,4 @@ workflow ALLELE_DISCOVERY {
         cdna_matches = CDNA_PROCESSING.out.cdna_matches
         mapped_cdna_clusters = CDNA_PROCESSING.out.mapped_cdna_clusters
 
-
 }

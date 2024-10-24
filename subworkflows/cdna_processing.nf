@@ -1,6 +1,7 @@
-include { MAP_CLUSTERS_TO_CDNA } from ""
-include { FIND_CDNA_GDNA_MATCHES } from ""
-include { RENAME_CDNA_MATCHED_FASTA } from ""
+include { MAP_CLUSTERS_TO_CDNA; COLLECT_MUSCLE_RESULTS } from "../modules/muscle"
+include { FIND_CDNA_GDNA_MATCHES } from "../modules/awk"
+include { RENAME_CDNA_MATCHED_FASTA } from "../modules/rename_cdna_matched"
+include { EXTRACT_NOVEL_SEQUENCES } from "../modules/bbmap"
 
 workflow CDNA_PROCESSING {
 
@@ -11,16 +12,27 @@ workflow CDNA_PROCESSING {
     main:
 
         MAP_CLUSTERS_TO_CDNA (
-            FILTER_EXACT_GDNA_MATCHES.out.no_gdna_match,
-            ch_cdna_ref
+            ch_no_gdna_matches
+                .splitFasta( record: [id: true, seqString: true] )
+                .combine(
+                    ch_cdna_ref
+                        .splitFasta( record: [id: true, seqString: true] )
+                )
+                .map { nogdna_record, cdna_ref -> 
+                    tuple( nogdna_record.id, no_gdna_record.seqString, cdna_ref.id, cdna_ref.seqString )
+                }
+        )
+
+        COLLECT_MUSCLE_RESULTS (
+            MAP_CLUSTERS_TO_CDNA.out.collect()
         )
 
         FIND_CDNA_GDNA_MATCHES (
-            MAP_SHARED_CLUSTERS_TO_CDNA.out
+            COLLECT_MUSCLE_RESULTS.out
         )
 
         RENAME_CDNA_MATCHED_FASTA (
-            FILTER_EXACT_GDNA_MATCHES.out.no_gdna_match,
+            ch_no_gdna_matches,
             FIND_CDNA_GDNA_MATCHES.out
         )
 
@@ -31,7 +43,6 @@ workflow CDNA_PROCESSING {
 
     emit:
         novel_seqs = EXTRACT_NOVEL_SEQUENCES.out
-        no_gdna_matches = FILTER_EXACT_GDNA_MATCHES.out.no_gdna_match
         cdna_matches = RENAME_CDNA_MATCHED_FASTA.out
         mapped_cdna_clusters = MAP_CLUSTERS_TO_CDNA.out
 
