@@ -140,3 +140,27 @@ process MERGE_ALL_ANIMALS {
   """
 
 }
+
+process MERGE_SEQS_FOR_GENOTYPING {
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    cpus 4
+
+    input:
+    path "genotyping_seqs/*"
+
+    output:
+    path "reads.fasta"
+
+    script:
+    """
+    seqkit scat \
+    --find-only \
+    --threads ${task.cpus} \
+    genotyping_seqs/ \
+    -o reads.fasta
+    """
+
+}

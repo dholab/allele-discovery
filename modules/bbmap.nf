@@ -172,3 +172,36 @@ process SHARED_ANIMALS {
     """
 
 }
+
+
+process FILTER_EXACT_GDNA_MATCHES {
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    input:
+    path(all_mappings)
+    path(putative_alleles)
+    path gdna_ref
+
+    output:
+    path "gdna_match.sam", emit: gdna_match
+    path "no_gdna_match.fasta", emit: no_gdna_match
+
+    script:
+    """
+    filterlines.sh \
+	in=${all_mappings} \
+	out=gdna_match.sam \
+	names=NM:i:0 \
+	substring=t \
+	include=t
+    
+    filterbyname.sh \
+	in=${putative_alleles} \
+	names=gdna_match.sam \
+	out=no_gdna_match.fasta
+    """
+
+}
+

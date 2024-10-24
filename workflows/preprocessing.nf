@@ -30,6 +30,7 @@ workflow PREPROCESSING {
         )
 
     emit:
-
+        amplicon_reads = ENRICH_AMPLICONS.out
+        clusters_fasta = CLUSTERING.out
 
 }

@@ -50,6 +50,8 @@ workflow ENRICH_AMPLICONS {
 
         EXTRACT_TOP_QUALITY (
             REMOVE_SHORT_READS.out
+                .map { sample_id, fastq -> tuple( sample_id, file(fastq), file(fastq).countFastq() ) }
+                .filter { it[2] >= params.best_read_count }
         )
 
         AMPLICON_STATS (

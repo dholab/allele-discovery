@@ -37,10 +37,11 @@ workflow CLUSTERING {
             MERGE_PER_ANIMAL_CLUSTERS.out
         )
 
-        RENAME_PUTATIVE_ALLELE_CLISTERS (
+        RENAME_PUTATIVE_ALLELE_CLUSTERS (
             SHARED_ANIMALS.out
         )
 
     emit:
+        RENAME_PUTATIVE_ALLELE_CLUSTERS.out
 
 }
