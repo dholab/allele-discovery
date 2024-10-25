@@ -1,5 +1,8 @@
+set unstable := true
+
 alias deps := test-deps
 alias dependencies := test-deps
+alias py-deps := test-py-deps
 
 @default:
 	just --list
@@ -21,9 +24,8 @@ test-sh-deps:
 
 	echo "All dependencies have been successfully installed and are available in the command line."
 
+[script("python3")]
 test-py-deps:
-	#!/usr/bin/env python3
-
 	import openpyxl
 	import snakemake
 	import pysam
