@@ -32,5 +32,6 @@ workflow PREPROCESSING {
     emit:
         amplicon_reads = ENRICH_AMPLICONS.out
         clusters_fasta = CLUSTERING.out
+        indexed_guide = PREPARE_SEQUENCE_FILES.out.indexed_guide
 
 }

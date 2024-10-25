@@ -21,6 +21,7 @@ workflow GDNA_PROCESSING {
         )
 
     emit:
-        FILTER_EXACT_GDNA_MATCHES.out
+        gdna_match = FILTER_EXACT_GDNA_MATCHES.out.gdna_match
+        no_gdna_match = FILTER_EXACT_GDNA_MATCHES.out.no_gdna_match
 
 }

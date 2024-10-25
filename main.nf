@@ -97,7 +97,7 @@ workflow {
         ch_gdna_ref,
         PREPROCESSING.out.allele_clusters,
         PREPROCESSING.out.amplicon_reads,
-        PREPROCESSING.out.mapped_cdna_clusters,
+        ALLELE_DISCOVERY.out.mapped_cdna_clusters,
         ALLELE_DISCOVERY.out.novel_seqs,
         ALLELE_DISCOVERY.out.cdna_matches
     )

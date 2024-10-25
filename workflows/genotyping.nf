@@ -18,12 +18,12 @@ workflow GENOTYPING {
             ch_gdna_ref,
             ch_novel_seqs,
             ch_cdna_matches,
-            ch_mapped_cdna_clusters
+            ch_mapped_cdna_clusters,
+            ch_amplicon_reads
         )
 
         GENOTYPE_REPORTING (
-            PREPARE_GENOTYPES.out,
-            ch_amplicon_reads
+            PREPARE_GENOTYPES.out
         )
 
 }

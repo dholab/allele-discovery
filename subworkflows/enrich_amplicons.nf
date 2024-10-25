@@ -62,11 +62,7 @@ workflow ENRICH_AMPLICONS {
             EXTRACT_TOP_QUALITY.out.groupTuple( by: 0 )
         )
 
-        FAIDX (
-            MERGE_BY_SAMPLE.out
-        )
-
     emit:
-        FAIDX.out
+        MERGE_BY_SAMPLE.out
 
 } 

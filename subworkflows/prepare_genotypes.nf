@@ -4,6 +4,10 @@ include {
     PARSE_DISTANCES
     } from "../modules/clustalo"
 include { CREATE_GENOTYPING_FASTA } from "..modules/create_genotyping_fasta"
+include { GENOTYPE_AMPLICONS } from "../modules/minimap2"
+include { FILTER_ALIGNMENTS } from "../modules/filter_alignments
+include { SORT_BAM } from "../modules/samtools"
+include { REMOVE_HEADERS } from "../modules/bbmap"
 
 workflow PREPARE_GENOTYPES {
 
@@ -13,6 +17,7 @@ workflow PREPARE_GENOTYPES {
         ch_novel_seqs
         ch_cdna_matches
         ch_mapped_cdna_clusters
+        ch_amplicon_reads
 
     main:
 
@@ -41,7 +46,24 @@ workflow PREPARE_GENOTYPES {
             PARSE_DISTANCES.out.novel_closest_matches
         )
 
-    emit:
-        CREATE_GENOTYPING_FASTA.out
+        GENOTYPE_AMPLICONS (
+            CREATE_GENOTYPING_FASTA.out,
+            ch_amplicon_reads
+        )
 
+        FILTER_ALIGNMENTS (
+            GENOTYPE_AMPLICONS.out,
+            CREATE_GENOTYPING_FASTA.out
+        )
+
+        SORT_BAM (
+            FILTER_ALIGNMENTS.out
+        )       
+        
+        REMOVE_HEADERS (
+            SORT_BAM.out
+        )
+
+    emit:
+        REMOVE_HEADERS.out
 }

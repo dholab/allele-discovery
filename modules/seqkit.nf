@@ -11,10 +11,10 @@ process FIND_COMPLETE_AMPLICONS {
   tuple path(reads), val(amplicon_label), val(forward_primer), val(reverese_primer_rc)
 
   output:
-  tuple val(barcode), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path("${barcode}_amplicons.fastq.gz")
+  tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path("${sample_id}_amplicons.fastq.gz")
 
   script:
-  barcode = file(reads).getSimpleName()
+  sample_id = file(reads).getSimpleName()
   """
   cat ${reads} | \
   seqkit grep \
@@ -23,7 +23,7 @@ process FIND_COMPLETE_AMPLICONS {
   --by-seq \
   --use-regexp \
   --pattern "{forward_primer}.*{reverse_primer_rc}"
-  -o ${barcode}_amplicons.fastq.gz
+  -o ${sample_id}_amplicons.fastq.gz
   """
 
 }
@@ -38,10 +38,10 @@ process TRIM_ENDS_TO_PRIMERS {
   cpus 4
 
   input:
-  tuple val(barcode), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path(untrimmed_reads)
+  tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path(untrimmed_reads)
 
   output:
-  tuple val(barcode), path("${barcode}*.trimmed.fastq.gz")
+  tuple val(sample_id), path("${sample_id}*.trimmed.fastq.gz")
 
   script:
   """
@@ -52,7 +52,7 @@ process TRIM_ENDS_TO_PRIMERS {
   --max-mismatch ${params.max_mismatch} \
   --strict-mode \
   --threads ${task.cpus} \
-  --out-file ${barcode}.${amplicon_label}.trimmed.fastq.gz \
+  --out-file ${sample_id}.${amplicon_label}.trimmed.fastq.gz \
   ${untrimmed_reads}
   """
 
@@ -62,7 +62,7 @@ process AMPLICON_STATS {
 
   /* */
 
-  tag "${barcode}"
+  tag "${sample_id}"
 
   errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
   maxRetries 2
@@ -70,17 +70,17 @@ process AMPLICON_STATS {
   cpus 4
 
   input:
-  tuple val(barcode), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path("amplicons/*")
+  tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path("amplicons/*")
 
   output:
-  path "${barcode}.per_amplicon_stats.tsv"
+  path "${sample_id}.per_amplicon_stats.tsv"
 
   script:
   """
   seqkit stats \
   --threads ${task.cpus} \
   --all --basename --tabular \
-  amplicons/*.fastq.gz > ${barcode}.per_amplicon_stats.tsv
+  amplicons/*.fastq.gz > ${sample_id}.per_amplicon_stats.tsv
   """
 
 }
@@ -89,7 +89,7 @@ process MERGE_BY_SAMPLE {
 
   /* */
 
-  tag "${barcode}"
+  tag "${sample_id}"
 
   errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
   maxRetries 2
@@ -97,10 +97,10 @@ process MERGE_BY_SAMPLE {
   cpus 4
 
   input:
-  tuple val(barcode), path("fastqs/*")
+  tuple val(sample_id), path("fastqs/*")
 
   output:
-  tuple val(barcode), path("${barcode}.amplicons.fastq.gz")
+  tuple val(sample_id), path("${sample_id}.amplicons.fastq.gz")
 
   script:
   """
@@ -108,7 +108,7 @@ process MERGE_BY_SAMPLE {
   --find-only \
   --threads ${task.cpus} \
   fastqs/ \
-  | bgzip -o ${barcode}.amplicons.fastq.gz
+  | bgzip -o ${sample_id}.amplicons.fastq.gz
   """
 
 }
@@ -117,7 +117,7 @@ process MERGE_ALL_ANIMALS {
 
   /* */
 
-  tag "${barcode}"
+  tag "${sample_id}"
 
   errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
   maxRetries 2
@@ -128,7 +128,7 @@ process MERGE_ALL_ANIMALS {
   path "per_animal_clusters/*"
 
   output:
-  tuple val(barcode), path("merged.fasta.gz")
+  tuple val(sample_id), path("merged.fasta.gz")
 
   script:
   """

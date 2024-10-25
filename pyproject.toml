@@ -1,6 +1,6 @@
 [project]
 name = "allele-discovery"
-description = "A Snakemake workflow for discovering novel alleles with PacBio HiFi reads"
+description = "A bioinformatic pipeline for discovering and genotyping with novel alleles from long, accurate amplicons."
 authors = [
     { name = "David H. O'Connor", email = "dhoconno@wisc.edu" },
     { name = "Nicholas R. Minor", email = "nrminor@wisc.edu" },

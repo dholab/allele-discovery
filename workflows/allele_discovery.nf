@@ -19,14 +19,14 @@ workflow ALLELE_DISCOVERY {
         )
 
         CDNA_PROCESSING (
-            FILTER_EXACT_GDNA_MATCHES.out.no_gdna_match,
+            GDNA_PROCESSING.out.no_gdna_match,
             ch_cdna_ref
         )
 
         ALLELE_ANNOTATION (
             ch_hla_mrna_ref,
             ch_hla_cds_annotation,
-            DNA_PROCESSING.out.novel_seqs,
+            CDNA_PROCESSING.out.novel_seqs,
             CDNA_PROCESSING.out.no_gdna_matches,
             CDNA_PROCESSING.out.cdna_matches
         )

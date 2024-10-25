@@ -10,13 +10,12 @@ process RUN_PBAA {
 	cpus 4
 
 	input:
-	tuple path(reads), path(guide_fasta), path(fai)
+	tuple val(sample_id), path(reads), path(fqidx), path(guide_fasta), path(fai)
 
 	output:
     tuple val(sample_id), path("${sample_id}_passed_cluster_sequences.fasta")
 
 	script:
-    sample_id = file(reads).getSimpleName()
 	"""
     pbaa cluster \
     ${guide_fasta} \

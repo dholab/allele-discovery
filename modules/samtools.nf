@@ -1,58 +1,53 @@
 process CONVERT_AND_SORT {
 
-    tag "${barcode}"
-
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
 	maxRetries 2
 
     input:
-    tuple val(barcode), path(sam)
+    path(sam)
 
     output:
-    tuple val(barcode), path("${barcode}.bam")
+    path("${file_label}.bam")
 
     script:
+	file_label = file(sam).getSimpleName()
     """
     samtools view -bS ${sam} \
-    | samtools sort -M -o ${barcode}.bam
+    | samtools sort -M -o ${file_label}.bam
     """
 
 }
 
 process SORT_BAM {
 
-    tag "${barcode}"
-
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
 	maxRetries 2
 
     input:
-    tuple val(barcode), path(bam)
+    path bam
 
     output:
-    tuple val(barcode), path("${barcode}.sorted.bam")
+    path("*.sorted.bam")
 
     script:
+	file_label = file(bam).getSimpleName()
     """
     cat ${bam} \
-    | samtools sort -M -o ${barcode}.sorted.bam
+    | samtools sort -M -o ${file_label}.sorted.bam
     """
 
 }
 
-process INDEX {
-
-    tag "${barcode}"
-    publishDir params.alignment, mode: 'copy', overwrite: true
+process INDEX_BAM {
 
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
 	maxRetries 2
 
     input:
-    tuple val(barcode), path(bam)
+    path bam
 
     output:
-    tuple val(barcode), path(bam), path("${barcode}*.bam.bai")
+    tuple path(bam), path("*.bam.bai")
 
     script:
     """
@@ -63,27 +58,25 @@ process INDEX {
 
 process FASTQ_CONVERSION {
 
-    tag "${barcode}"
+    tag "${sample_id}"
 
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
 	maxRetries 2
 
     input:
-    tuple val(barcode), path(bam)
+    tuple val(sample_id), path(bam)
 
     output:
-    tuple val(barcode), path("${barcode}.fastq.gz")
+    tuple val(sample_id), path("${sample_id}.fastq.gz")
 
     script:
     """
-    samtools fastq ${bam} | bgzip -o ${barcode}.fastq.gz
+    samtools fastq ${bam} | bgzip -o ${sample_id}.fastq.gz
     """
 
 }
 
 process FAIDX {
-
-    tag "${barcode}"
 
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
 	maxRetries 2
@@ -97,6 +90,26 @@ process FAIDX {
     script:
     """
     samtools faidx ${fasta}
+    """
+
+}
+
+process FQIDX {
+
+    tag "${sample_id}"
+
+	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+	maxRetries 2
+
+    input:
+    tuple val(sample_id), path(fastq)
+
+    output:
+    tuple val(sample_id), path(fastq), path("${fastq}.fai")
+
+    script:
+    """
+    samtools fqidx ${fastq}
     """
 
 }

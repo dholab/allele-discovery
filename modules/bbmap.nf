@@ -207,8 +207,6 @@ process FILTER_EXACT_GDNA_MATCHES {
 
 process EXTRACT_NOVEL_SEQUENCES {
 
-    publishDir "${params.results}/novel", mode: 'copy', overwrite: true
-
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
@@ -224,6 +222,27 @@ process EXTRACT_NOVEL_SEQUENCES {
     script:
     """
     mapPacBio.sh in=${no_gdna_match} ref=${cdna_matches} outu=novel.fasta subfilter=0
+    """
+
+}
+
+process REMOVE_HEADERS {
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    cpus 3
+
+    input:
+    path bam
+
+    output:
+    path "*.noheaders.sam"
+
+    script:
+    file_label = file(bam).getSimpleName()
+    """
+    reformat.sh in=${bam} out=${file_label}.noheaders.sam noheader=t -Xmx8g
     """
 
 }

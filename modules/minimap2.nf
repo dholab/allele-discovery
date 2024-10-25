@@ -29,6 +29,8 @@ process GENOTYPE_AMPLICONS {
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
+    cpus 4
+
     input:
     each path(genotyping_fasta)
     path trimmed_fastq
@@ -42,16 +44,14 @@ process GENOTYPE_AMPLICONS {
     minimap2 \
     ${genotyping_fasta} \
     ${trimmed_fastq} \
-    -ax map-hifi --eqx -t 3 \
+    -ax map-hifi --eqx -t ${task.cpus} \
     | reformat.sh \
     in=stdin.sam \
-    out=${id}.sam \
+    out=${id}.bam \
     ref=${genotyping_fasta} \
     noheader=t \
-    subfilter=0 \
-    threads=1 \
-    ow=t \
-    -da
+    threads=${task.cpus} \
+    ow=t
     """
 
 }
