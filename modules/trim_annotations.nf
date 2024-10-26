@@ -24,13 +24,15 @@ process NOVEL_TRIM_ANNOTATIONS {
     maxRetries 2
 
     input:
+    path prelim_gff
+    path no_gdna_match
 
     output:
     path "cdna.gff"
 
     script:
     """
-    trim_annotations.py
+    trim_annotations.py ${prelim_gff} ${no_gdna_match}
     """
 
 }

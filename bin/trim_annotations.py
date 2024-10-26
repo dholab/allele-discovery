@@ -1,9 +1,13 @@
+#!/usr/bin/env python3
+
+import sys
+
 import pandas as pd
 from Bio import SeqIO
 
 # import GFF file to dataframe
-df = pd.read_csv(
-    snakemake.input[0],
+gff_df = pd.read_csv(
+    sys.argv[1],
     sep="\t",
     names=[
         "seqid",
@@ -19,11 +23,11 @@ df = pd.read_csv(
 )
 
 # read sequence from FASTA file
-with open(snakemake.output[0], "w") as handle:
-    for record in SeqIO.parse(snakemake.input[1], "fasta"):
+with open(sys.argv[1], "w") as handle:
+    for record in SeqIO.parse(sys.argv[2], "fasta"):
         # filter on single seqid
         df_query = "seqid == " + (str(record.id))
-        seqid_df = df.query(df_query)
+        seqid_df = gff_df.query(df_query)
 
         # sort by start coordinate
         seqid_df.sort_values(by=["start"], ascending=True)
@@ -40,7 +44,7 @@ with open(snakemake.output[0], "w") as handle:
         # set counter for each CDS annotation for a record
         ct = 0
 
-        for idx, row in seqid_df.iterrows():
+        for _, row in seqid_df.iterrows():
             # read each GFF row into a variable
             # change these variables when start and stop codon positions change
             seqid = row["seqid"]

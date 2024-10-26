@@ -42,7 +42,10 @@ process PARSE_DISTANCES {
 
     script:
     """
-    parse_clustalo_distances.py
+    parse_clustalo_distances.py \
+    --novel_alleles ${novel_alleles} \
+    --distances ${distances} \
+    --cdna_matches ${cdna_matches}
     """
 
 }
