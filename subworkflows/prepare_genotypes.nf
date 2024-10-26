@@ -4,6 +4,7 @@ include {
     PARSE_DISTANCES
     } from "../modules/clustalo"
 include { CREATE_GENOTYPING_FASTA } from "..modules/create_genotyping_fasta"
+include { FAIDX; SORT_BAM } from "../modules/samtools"
 include { GENOTYPE_AMPLICONS } from "../modules/minimap2"
 include { FILTER_ALIGNMENTS } from "../modules/filter_alignments
 include { SORT_BAM } from "../modules/samtools"
@@ -28,27 +29,40 @@ workflow PREPARE_GENOTYPES {
             .collect()
         )
 
-        CLUSTAL_ALIGN (
-            MERGE_SEQS_FOR_GENOTYPING.out,
-            ch_novel_seqs
-        )
+        if ( params.cdna_reference_fasta ) {
+        
+            CLUSTAL_ALIGN (
+                MERGE_SEQS_FOR_GENOTYPING.out,
+                ch_novel_seqs
+            )
 
-        PARSE_DISTANCES (
-            CLUSTAL_ALIGN.out.distmat,
-            ch_novel_seqs,
-            ch_cdna_matches
-        )
+            PARSE_DISTANCES (
+                CLUSTAL_ALIGN.out.distmat,
+                ch_novel_seqs,
+                ch_cdna_matches
+            )
 
-        CREATE_GENOTYPING_FASTA (
-            ch_allele_clusters,
-            ch_gdna_ref,
-            ch_mapped_cdna_clusters,
-            PARSE_DISTANCES.out.novel_closest_matches
-        )
+            CREATE_GENOTYPING_FASTA (
+                ch_allele_clusters,
+                ch_gdna_ref,
+                ch_mapped_cdna_clusters,
+                PARSE_DISTANCES.out.novel_closest_matches
+            )
+
+            FAIDX (
+                CREATE_GENOTYPING_FASTA.out
+            )
+        
+        } else {
+        
+            FAIDX (
+                MERGE_SEQS_FOR_GENOTYPING.out
+            )
+                
+        }
 
         GENOTYPE_AMPLICONS (
-            CREATE_GENOTYPING_FASTA.out,
-            ch_amplicon_reads
+            ch_amplicon_reads.combine( FAIDX.out )
         )
 
         FILTER_ALIGNMENTS (
@@ -66,4 +80,5 @@ workflow PREPARE_GENOTYPES {
 
     emit:
         REMOVE_HEADERS.out
+
 }

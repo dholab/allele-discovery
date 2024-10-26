@@ -141,6 +141,30 @@ process MERGE_ALL_ANIMALS {
 
 }
 
+process VALIDATE_NOVEL_SEQUENCES {
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    cpus 4
+
+    input:
+    path fasta
+
+    output:
+    path "novel.validated.fasta"
+
+    script:
+    """
+    seqkit seq \
+    --upper-case \
+    --validate-seq \
+    ${fasta} \
+    -o novel.validated.fasta
+    """
+
+}
+
 process MERGE_SEQS_FOR_GENOTYPING {
 
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }

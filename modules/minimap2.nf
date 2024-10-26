@@ -26,14 +26,15 @@ process MAP_CLUSTERS_TO_FULL_LENGTH_GDNA {
 
 process GENOTYPE_AMPLICONS {
 
+    tag "${id}"
+
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
     cpus 4
 
     input:
-    each path(genotyping_fasta)
-    path trimmed_fastq
+    tuple path(genotyping_fasta), path(fasta_idx), path(trimmed_fastq)
 
     output:
     path "${id}.sam"
@@ -47,7 +48,7 @@ process GENOTYPE_AMPLICONS {
     -ax map-hifi --eqx -t ${task.cpus} \
     | reformat.sh \
     in=stdin.sam \
-    out=${id}.bam \
+    out=${id}.sam \
     ref=${genotyping_fasta} \
     noheader=t \
     threads=${task.cpus} \

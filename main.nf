@@ -69,8 +69,9 @@ workflow {
     ch_gdna_ref = Channel
         .fromPath ( params.gdna_reference_fasta )
 
-    ch_cdna_ref = Channel
-        .fromPath ( params.cdna_reference_fasta )
+    ch_cdna_ref = params.cdna_reference_fasta ?
+        Channel.fromPath ( params.cdna_reference_fasta ) :
+        Channel.empty()
 
     ch_hla_mrna_ref = Channel
         .fromPath ( params.hla_mrna_reference )
