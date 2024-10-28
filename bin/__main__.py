@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import subprocess
 import sys
@@ -15,47 +17,11 @@ def parse_command_line_args() -> argparse.Namespace:
     # create the run subcommand
     run = subparsers.add_parser("run", help="Run the full allele discovery pipeline")
     run.add_argument(
-        "--snakefile",
-        "-s",
+        "--nf_main",
+        "-m",
         type=str,
-        help="The location of the desired snakefile, defaulting the './Snakefile'.",
-        default=HERE.joinpath(Path("Snakefile")),
-    )
-    run.add_argument(
-        "--config",
-        "-c",
-        type=str,
-        help="Location of the allele discovery configuration file in YAML format",
-        default=HERE.joinpath(Path("config/config.yaml")),
-    )
-    run.add_argument(
-        "--cores",
-        "-j",
-        type=int,
-        help="The desired number of CPU cores to parallelize across.",
-        default=3,
-    )
-    run.add_argument(
-        "--dry-run",
-        "-d",
-        action="store_true",
-        help="Whether to print the pipeline's steps without running them.",
-    )
-    run.add_argument(
-        "-v",
-        "--verbose",
-        action="count",
-        default=0,
-        help="Increase verbosity level (-v for WARNING, -vv for INFO, -vvv for DEBUG)",
-        required=False,
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        action="count",
-        default=0,
-        help="Increase verbosity level (-v for WARNING, -vv for INFO, -vvv for DEBUG)",
-        required=False,
+        help="The location of the pipeline entrypoint, defaulting to main.nf in the project root directory.",
+        default=HERE.joinpath(Path("main.nf")),
     )
 
     return parser.parse_args()
@@ -80,21 +46,18 @@ def main() -> None:
     logger.add(sys.stderr, colorize=True, level=level)
 
     # construct the command based on whether a dry run was requested
-    command = (
-        f"snakemake --snakefile {args.snakefile} --configfile {args.config} --cores {args.cores}"
-        if not args.dry_run
-        else f"snakemake --snakefile {args.snakefile} --configfile {args.config} --cores {args.cores} --dry-run"
-    )
+    command = f"nextflow run {args.nf_main}"
 
     # log out the command if in debug mode
-    logger.debug("Launching pipeline with the following snakemake command:")
+    logger.debug("Launching pipeline with the following nextflow command:")
     logger.debug(command)
     command_list = command.split(" ")
     logger.debug(f"Command prepared for subprocessing: {command_list}")
 
     # run the pipeline
     try:
-        subprocess.run(command_list, check=True, text=True, capture_output=False)  # noqa: S603
+        logger.info("The pipeline wrapper CLI is not yet operational.")
+        # subprocess.run(command_list, check=True, text=True, capture_output=False)  # noqa: ERA001
     except subprocess.CalledProcessError as e:
         logger.error(
             f"Pipeline failed with the following error.\n\n```\n{e}\n```\n\nAborting.",
