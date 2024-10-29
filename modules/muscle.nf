@@ -16,7 +16,7 @@ process MAP_CLUSTERS_TO_CDNA {
     echo "!{query_id}\t!{ref_id}\t!{query_seq_len}\t!{ref_seq_len}\t \
     $(echo '>!{query_id}\n!{query_seq}\n>!{ref_id}\n!{ref_seq}')" \
     | muscle -maxiters 2 -quiet -clwstrict \
-    | grep "^ " | grep "\*" -o | wc -l > ${query_id}_to_${ref_id}.aln
+    | grep "^ " | grep "\\*" -o | wc -l 
     '''
 
 }

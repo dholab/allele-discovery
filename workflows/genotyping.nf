@@ -1,5 +1,5 @@
-include { PREPARE_GENOTYPES } "../subworkflows/prepare_genotypes"
-include { GENOTYPE_REPORTING } "../subworkflows/genotype_reporting"
+include { PREPARE_GENOTYPES } from "../subworkflows/prepare_genotypes"
+include { GENOTYPE_REPORTING } from "../subworkflows/genotype_reporting"
 
 workflow GENOTYPING {
 

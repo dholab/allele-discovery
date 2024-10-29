@@ -37,7 +37,7 @@ process PRELIM_EXONERATE_MERGE_CDS {
 
 }
 
-process NOVEL_EXONERATE_PROCESS_GFFS {
+process NOVEL_EXONERATE_PROCESS_GFF {
 
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2

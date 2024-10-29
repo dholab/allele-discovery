@@ -148,7 +148,7 @@ process SHARED_ANIMALS {
     output:
     path("putative_alleles_temp.fasta")
 
-    scrip:
+    script:
     """
     dedupe.sh -Xmx1g \
         in=${merged_clusters} \

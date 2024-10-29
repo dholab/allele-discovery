@@ -2,9 +2,9 @@
 
 nextflow.enable.dsl = 2
 
-include { PREPROCESSING } from "workflows/preprocessing"
-include { ALLELE_DISCOVERY } from "workflows/allele_discovery"
-include { GENOTYPING } from "workflows/genotyping"
+include { PREPROCESSING } from "./workflows/preprocessing"
+include { ALLELE_DISCOVERY } from "./workflows/allele_discovery"
+include { GENOTYPING } from "./workflows/genotyping"
 
 workflow {
 
