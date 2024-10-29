@@ -180,3 +180,12 @@ logs
 ._*
 results
 data
+.nextflow/
+work/
+inputs/
+scratch/
+data/
+fastqs/
+sandbox/
+results/
+.nextflow.log*
