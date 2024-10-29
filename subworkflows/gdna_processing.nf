@@ -15,7 +15,7 @@ workflow GDNA_PROCESSING {
         )
 
         FILTER_EXACT_GDNA_MATCHES (
-            MAP_SHARED_CLUSTERS_TO_FULL_LENGTH_GDNA.out,
+            MAP_CLUSTERS_TO_FULL_LENGTH_GDNA.out,
             ch_allele_clusters,
             ch_gdna_ref
         )

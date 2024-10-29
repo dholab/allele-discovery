@@ -37,8 +37,8 @@ process PARSE_DISTANCES {
     path cdna_matches
 
     output:
-    path "novel_closest_matches.xlsx", novel_closest_matches
-    path "distances_tmp.txt", distances_tmp
+    path "novel_closest_matches.xlsx", emit: novel_closest_matches
+    path "distances_tmp.txt", emit: distances_tmp
 
     script:
     """

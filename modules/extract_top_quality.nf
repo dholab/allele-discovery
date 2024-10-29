@@ -3,7 +3,6 @@ process EXTRACT_TOP_QUALITY {
     /* */
 
 	tag "${sample_id}"
-    publishDir params.merged, mode: 'copy', overwrite: true
 
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
 	maxRetries 2

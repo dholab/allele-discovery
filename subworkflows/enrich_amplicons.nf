@@ -6,6 +6,7 @@ include { VALIDATE_READS } from "../modules/validate"
 include {
     AMPLICON_STATS;
     FIND_COMPLETE_AMPLICONS;
+    TRIM_ENDS_TO_PRIMERS;
     MERGE_BY_SAMPLE;
 } from "../modules/seqkit"
 
@@ -23,7 +24,7 @@ workflow ENRICH_AMPLICONS {
         )
 
         ORIENT_READS (
-            VALIDATE_READS.OUT
+            VALIDATE_READS.out
                 .map { barcode, fastq -> tuple( barcode, file(fastq), file(fastq).countFastq() ) }
                 .filter { it[2] > params.min_total_reads }
                 .map { barcode, fastq, read_count -> tuple( barcode, file(fastq) ) },

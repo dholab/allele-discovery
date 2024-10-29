@@ -5,13 +5,14 @@ process TRIM_ANNOTATIONS {
 
     input:
     path prelim_annotations
+    path no_gdna_matches
 
     output:
     path "cdna.gff"
 
     script:
     """
-    trim_annotations.py
+    trim_annotations.py ${prelim_annotations} ${no_gdna_matches}
     """
 
 }

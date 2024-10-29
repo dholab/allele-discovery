@@ -21,7 +21,7 @@ workflow PREPROCESSING {
         
         PREPARE_SEQUENCE_FILES (
             ENRICH_AMPLICONS.out,
-            ch_guide_fasta.out
+            ch_guide_fasta
         )
 
         CLUSTERING (

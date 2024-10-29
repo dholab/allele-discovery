@@ -40,7 +40,7 @@ workflow CDNA_PROCESSING {
             )
 
             EXTRACT_NOVEL_SEQUENCES (
-                ch_no_gdna_match,
+                ch_no_gdna_matches,
                 RENAME_CDNA_MATCHED_FASTA.out
             )
 
@@ -51,7 +51,7 @@ workflow CDNA_PROCESSING {
         } else {
         
             VALIDATE_NOVEL_SEQUENCES (
-                ch_no_gdna_match
+                ch_no_gdna_matches
             )
         
         }

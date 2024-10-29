@@ -27,13 +27,13 @@ workflow ALLELE_DISCOVERY {
             ch_hla_mrna_ref,
             ch_hla_cds_annotation,
             CDNA_PROCESSING.out.novel_seqs,
-            CDNA_PROCESSING.out.no_gdna_matches,
+            GDNA_PROCESSING.out.no_gdna_match,
             CDNA_PROCESSING.out.cdna_matches
         )
 
     emit:
         novel_seqs = CDNA_PROCESSING.out.novel_seqs
-        no_gdna_matches = CDNA_PROCESSING.out.no_gdna_match
+        no_gdna_matches = GDNA_PROCESSING.out.no_gdna_match
         cdna_matches = CDNA_PROCESSING.out.cdna_matches
         mapped_cdna_clusters = CDNA_PROCESSING.out.mapped_cdna_clusters
 

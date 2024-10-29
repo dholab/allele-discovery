@@ -8,6 +8,7 @@ include {
     NOVEL_EXONERATE_PROCESS_GFF;
     NOVEL_EXONERATE_MERGE_CDS
     } from "../modules/gff_processing"
+include { EXTRACT_NOVEL_SEQUENCES } from "../modules/bbmap"
 include {
     TRIM_ANNOTATIONS;
     NOVEL_TRIM_ANNOTATIONS
@@ -54,12 +55,12 @@ workflow ALLELE_ANNOTATION {
             ch_hla_cds_annotation
         )
 
-        NOVEL_EXONERATE_PROCESS_GFFS (
+        NOVEL_EXONERATE_PROCESS_GFF (
             NOVEL_EXONERATE.out
         )
 
         NOVEL_EXONERATE_MERGE_CDS (
-            NOVEL_EXONERATE_PROCESS_GFFS.out
+            NOVEL_EXONERATE_PROCESS_GFF.out
         )
 
         NOVEL_TRIM_ANNOTATIONS (
