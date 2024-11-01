@@ -14,7 +14,6 @@ workflow CLUSTERING {
 
         RUN_PBAA (
             ch_amplicons
-                .map { sample_id, fastq -> fastq }
                 .combine( ch_indexed_guide ) 
         )
 
@@ -34,7 +33,7 @@ workflow CLUSTERING {
         )
 
         SHARED_ANIMALS (
-            MERGE_PER_ANIMAL_CLUSTERS.out
+            MERGE_ALL_ANIMALS.out
         )
 
         RENAME_PUTATIVE_ALLELE_CLUSTERS (

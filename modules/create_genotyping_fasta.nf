@@ -14,7 +14,11 @@ process CREATE_GENOTYPING_FASTA {
 
     script:
     """
-    create_genotyping_fasta.py
+    create_genotyping_fasta.py \
+    --novel_alleles ${putative_alleles} \
+    --known_alleles ${gdna_reference_fasta} \
+    --alignment ${matches_alignment} \
+    --closest_matches ${novel_closest_matches} 
     """
 
 }

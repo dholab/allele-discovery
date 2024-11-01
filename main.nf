@@ -34,31 +34,21 @@ workflow {
     A full-length genomic DNA reference FASTA must be provided with the 
     `--gdna_reference_fasta` command line argument.
     """
-    assert file(params.input_dir).isFile() :
+    assert file(params.gdna_reference_fasta).isFile() :
     """
     The full-length genomic DNA reference FASTA file provided with
     `--gdna_reference_fasta` does not exist.
     """
 
-    assert params.cdna_reference_fasta :
-    """
-    A full-length cDNA reference FASTA must be provided with the
-    `--cdna_reference_fasta` command line argument.
-    """
-    assert file(params.input_dir).isFile() :
-    """
-    The full-length cDNA reference FASTA file provided with
-    `--cdna_reference_fasta` does not exist.
-    """
-
     // input channels
     ch_fastqs = Channel
-        .fromPath("${params.input_dir}/*.fastq.gz")
+        .fromPath( "${params.input_dir}/*.f*q*" )
         .map { fq -> tuple( file(fq).getSimpleName(), file(fq) ) }
 
     ch_primer_pairs = Channel
         .fromPath( params.primer_tsv )
-        .splitCsv( header: true, sep: "\t", strip: true, charset: "UTF-8" )
+        .splitCsv( header: false, sep: "\t", strip: true )
+        .map { row -> tuple( row[0], row[1], row[2] ) }
 
     ch_mapping_reference_fasta = Channel
         .fromPath ( params.mapping_reference_fasta )

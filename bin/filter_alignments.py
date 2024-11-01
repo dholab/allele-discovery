@@ -20,9 +20,9 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "-i",
-        "--input_bam",
+        "--input_sam",
         required=True,
-        help="Input BAM file (unsorted)",
+        help="Input SAM file (unsorted)",
     )
     parser.add_argument(
         "-r",
@@ -101,7 +101,7 @@ def has_no_substitutions(cigar_tuples: list[tuple[int, int]]) -> bool:
     return all(op != substitution_code for op, _ in cigar_tuples)
 
 
-def filter_alignments(input_bam: str, reference_fasta: str, output_bam: str) -> None:  # noqa: C901
+def filter_alignments(input_sam: str, reference_fasta: str, output_bam: str) -> None:  # noqa: C901
     """
     Filter alignments based on the specified criteria and write to output BAM.
 
@@ -114,9 +114,9 @@ def filter_alignments(input_bam: str, reference_fasta: str, output_bam: str) -> 
 
     # Open input BAM
     try:
-        samfile = pysam.AlignmentFile(input_bam, "rb")
+        samfile = pysam.AlignmentFile(input_sam, "r")
     except FileNotFoundError:
-        sys.stderr.write(f"Error: Input BAM file '{input_bam}' not found.\n")
+        sys.stderr.write(f"Error: Input BAM file '{input_sam}' not found.\n")
         sys.exit(1)
 
     # Open output BAM (copy header from input)
@@ -166,7 +166,7 @@ def filter_alignments(input_bam: str, reference_fasta: str, output_bam: str) -> 
 
 def main() -> None:
     args = parse_arguments()
-    filter_alignments(args.input_bam, args.reference_fasta, args.output_bam)
+    filter_alignments(args.input_sam, args.reference_fasta, args.output_bam)
 
 
 if __name__ == "__main__":

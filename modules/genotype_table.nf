@@ -31,7 +31,7 @@ process CREATE_GENOTYPING_PIVOT {
 
     script:
     """
-    genotyping.py ${csv}
+    genotyping.py ${csv} "genotyping.xlsx"
     """
 
 }

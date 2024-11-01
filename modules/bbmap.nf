@@ -70,7 +70,7 @@ process DEDUP_CLUSTERS {
 	"""
     dedupe.sh -Xmx8g ow=t \
     in=${clusters} \
-    outbest=${sample_id}.renamed.fasta \
+    outbest=${sample_id}.clusters.deduped.fasta \
     fo c \
     threads=${task.cpus}
     """
@@ -92,14 +92,14 @@ process REMOVE_SHORT_READS {
 	tuple val(sample_id), path(amplicons)
 
 	output:
-	tuple val(sample_id), path("${sample_id}.amplicons.no_short.fastq.gz")
+	tuple val(sample_id), path("${sample_id}.amplicons.no_short.fastq")
 
 	script:
 	"""
     reformat.sh \
     in=${amplicons} \
-    out=${sample_id}.amplicons.no_short.fastq.gz \
-    minlength={params.min_read_length} \
+    out=${sample_id}.amplicons.no_short.fastq \
+    minlength=${params.min_read_length} \
     threads=${task.cpus}
     """
 
@@ -120,13 +120,16 @@ process RENAME_WITH_IDS {
 	tuple val(sample_id), path(sequences)
 
 	output:
-	tuple val(sample_id), path("${sample_id}.renamed.fastx.gz")
+	tuple val(sample_id), path("${sample_id}.renamed.fast*")
 
 	script:
+    output_ext = file(sequences).contains(".fasta") || file(sequences).contains(".fa") ?
+    "fasta" :
+    "fastq"
 	"""
     rename.sh -Xmx1g \
     in=${sequences} \
-    out="${sample_id}.renamed.fastx.gz" \
+    out="${sample_id}.renamed.${output_ext}" \
     prefix=${sample_id} \
     addprefix=t \
     threads=${task.cpus}

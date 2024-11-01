@@ -16,7 +16,7 @@ process VALIDATE_READS {
     tuple val(label), path("${label}.validated.fastq.gz"), val("success!")
 
     script:
-    if ( file(seq_file).getName().endsWith(".fastq.gz") )
+    if ( file(seq_file).getName().contains(".fastq") || file(seq_file).getName().contains(".fq") )
         """
         seqkit seq --validate-seq ${seq_file} -o ${label}.validated.fastq.gz
         """

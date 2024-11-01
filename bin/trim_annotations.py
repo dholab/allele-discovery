@@ -23,14 +23,11 @@ gff_df = pd.read_csv(
 )
 
 # read sequence from FASTA file
-with open(sys.argv[1], "w") as handle:
+with open("cdna.gff", "w") as output_handle:
     for record in SeqIO.parse(sys.argv[2], "fasta"):
         # filter on single seqid
-        df_query = "seqid == " + (str(record.id))
-        seqid_df = gff_df.query(df_query)
-
-        # sort by start coordinate
-        seqid_df.sort_values(by=["start"], ascending=True)
+        df_query = f"seqid == '{record.id}'"
+        seqid_df = gff_df.query(df_query).sort_values(by=["start"], ascending=True)
 
         # assuming start of CDS is in-frame
         # determine the frame of each subsequent exon
@@ -74,7 +71,7 @@ with open(sys.argv[1], "w") as handle:
             ct += 1
 
             # write new GFF file
-            handle.write(
+            output_handle.write(
                 str(seqid)
                 + "\t"
                 + str(source)

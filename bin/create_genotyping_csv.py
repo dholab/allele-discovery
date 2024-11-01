@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-OUTPUT_NAME = sys.argv[1] if sys.argv[1] else "genotyping.csv"
+OUTPUT_NAME = sys.argv[1] if len(sys.argv) > 1 else "genotyping.csv"
 
 # Make list from samples
 sam_files = Path.cwd().glob("*.sam")

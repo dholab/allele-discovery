@@ -34,25 +34,18 @@ process GENOTYPE_AMPLICONS {
     cpus 4
 
     input:
-    tuple path(genotyping_fasta), path(fasta_idx), path(trimmed_fastq)
+    tuple val(id), path(trimmed_fastq), path(genotyping_fasta), path(fasta_idx)
 
     output:
     path "${id}.sam"
 
     script:
-    id = file(trimmed_fastq).getSimpleName()
     """
     minimap2 \
     ${genotyping_fasta} \
     ${trimmed_fastq} \
     -ax map-hifi --eqx -t ${task.cpus} \
-    | reformat.sh \
-    in=stdin.sam \
-    out=${id}.sam \
-    ref=${genotyping_fasta} \
-    noheader=t \
-    threads=${task.cpus} \
-    ow=t
+    > ${id}.sam
     """
 
 }

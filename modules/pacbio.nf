@@ -20,7 +20,7 @@ process RUN_PBAA {
     pbaa cluster \
     ${guide_fasta} \
     ${reads} \
-    . \
+    ${sample_id} \
     --skip-chimera-detection \
     --num-threads ${task.cpus}
 	"""

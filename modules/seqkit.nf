@@ -1,60 +1,66 @@
 process FIND_COMPLETE_AMPLICONS {
 
-  /* */
+    /* */
 
-  errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-  maxRetries 2
+    tag "${sample_id}, ${amplicon_label}"
 
-  cpus 4
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
-  input:
-  tuple path(reads), val(amplicon_label), val(forward_primer), val(reverese_primer_rc)
+    cpus 4
 
-  output:
-  tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path("${sample_id}_amplicons.fastq.gz")
+    input:
+    tuple path(reads), val(amplicon_label), val(forward_primer), val(reverse_primer)
 
-  script:
-  sample_id = file(reads).getSimpleName()
-  """
-  cat ${reads} | \
-  seqkit grep \
-  --threads ${task.cpus} \
-  --max-mismatch ${params.max_mismatch} \
-  --by-seq \
-  --use-regexp \
-  --pattern "{forward_primer}.*{reverse_primer_rc}"
-  -o ${sample_id}_amplicons.fastq.gz
-  """
+    output:
+    tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverse_primer), path("${sample_id}.${amplicon_label}_amplicons.fastq.gz")
+
+    script:
+    sample_id = file(reads).getSimpleName()
+    """
+    cat ${reads} | \
+    seqkit grep \
+    --threads ${task.cpus} \
+    --max-mismatch ${params.max_mismatch} \
+    --by-seq \
+    --use-regexp \
+    --pattern ${forward_primer},${reverse_primer} \
+    -o ${sample_id}.${amplicon_label}_amplicons.fastq.gz
+    """
 
 }
 
 process TRIM_ENDS_TO_PRIMERS {
 
-  /* */
+    /* */
 
-  errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-  maxRetries 2
+    tag "${sample_id}, ${amplicon_label}"
 
-  cpus 4
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
-  input:
-  tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path(untrimmed_reads)
+    cpus 4
 
-  output:
-  tuple val(sample_id), path("${sample_id}*.trimmed.fastq.gz")
+    input:
+    tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverse_primer), path(untrimmed_reads)
 
-  script:
-  """
-  seqkit amplicon \
-  -f -r 1:-1 \
-  --forward ${forward_primer} \
-  --reverse ${reverse_primer_rc} \
-  --max-mismatch ${params.max_mismatch} \
-  --strict-mode \
-  --threads ${task.cpus} \
-  --out-file ${sample_id}.${amplicon_label}.trimmed.fastq.gz \
-  ${untrimmed_reads}
-  """
+    output:
+    tuple val(sample_id), path("${sample_id}*.trimmed.fastq.gz")
+
+    script:
+    fwd_len = forward_primer.length()
+    rev_len = reverse_primer.length()
+    """
+    seqkit amplicon \
+    --region ${fwd_len}:-${rev_len} \
+    --forward ${forward_primer} \
+    --reverse ${reverse_primer} \
+    --max-mismatch ${params.max_mismatch} \
+    --strict-mode \
+    --threads ${task.cpus} \
+    --out-file ${sample_id}.${amplicon_label}.trimmed.fastq.gz \
+    ${untrimmed_reads}
+    """
 
 }
 
@@ -70,7 +76,7 @@ process AMPLICON_STATS {
   cpus 4
 
   input:
-  tuple val(sample_id), val(amplicon_label), val(forward_primer), val(reverese_primer_rc), path("amplicons/*")
+  tuple val(sample_id), path("amplicons/*")
 
   output:
   path "${sample_id}.per_amplicon_stats.tsv"
@@ -80,7 +86,7 @@ process AMPLICON_STATS {
   seqkit stats \
   --threads ${task.cpus} \
   --all --basename --tabular \
-  amplicons/*.fastq.gz > ${sample_id}.per_amplicon_stats.tsv
+  amplicons/*.fastq* > ${sample_id}.per_amplicon_stats.tsv
   """
 
 }
@@ -97,7 +103,7 @@ process MERGE_BY_SAMPLE {
   cpus 4
 
   input:
-  tuple val(sample_id), path("fastqs/*")
+  tuple val(sample_id), path("fastqs/????.fastq")
 
   output:
   tuple val(sample_id), path("${sample_id}.amplicons.fastq.gz")
@@ -117,8 +123,6 @@ process MERGE_ALL_ANIMALS {
 
   /* */
 
-  tag "${sample_id}"
-
   errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
   maxRetries 2
 
@@ -128,7 +132,7 @@ process MERGE_ALL_ANIMALS {
   path "per_animal_clusters/*"
 
   output:
-  tuple val(sample_id), path("merged.fasta.gz")
+  path "merged.fasta.gz"
 
   script:
   """
@@ -176,15 +180,20 @@ process MERGE_SEQS_FOR_GENOTYPING {
     path "genotyping_seqs/*"
 
     output:
-    path "reads.fasta"
+    path "refs_with_novel.fasta"
 
     script:
     """
     seqkit scat \
+    --format fasta \
     --find-only \
     --threads ${task.cpus} \
     genotyping_seqs/ \
-    -o reads.fasta
+    -o potential_dups.fasta && \
+    seqkit rmdup \
+    --by-name \
+    potential_dups.fasta \
+    -o refs_with_novel.fasta 
     """
 
 }

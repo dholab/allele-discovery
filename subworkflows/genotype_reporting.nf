@@ -6,12 +6,12 @@ include {
 workflow GENOTYPE_REPORTING {
 
     take:
-        ch_genotyping_sam
+        ch_genotyping_sams
 
     main:
 
         CREATE_GENOTYPING_CSV (
-            ch_genotyping_sam
+            ch_genotyping_sams.collect()
         )
 
         CREATE_GENOTYPING_PIVOT (

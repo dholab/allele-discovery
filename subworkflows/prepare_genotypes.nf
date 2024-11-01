@@ -51,23 +51,32 @@ workflow PREPARE_GENOTYPES {
             FAIDX (
                 CREATE_GENOTYPING_FASTA.out
             )
+
+            GENOTYPE_AMPLICONS (
+                ch_amplicon_reads.combine( FAIDX.out )
+            )
+
+            FILTER_ALIGNMENTS (
+                GENOTYPE_AMPLICONS.out,
+                CREATE_GENOTYPING_FASTA.out
+            )
         
         } else {
         
             FAIDX (
                 MERGE_SEQS_FOR_GENOTYPING.out
             )
-                
+
+            GENOTYPE_AMPLICONS (
+                ch_amplicon_reads.combine( FAIDX.out )
+            )
+
+            FILTER_ALIGNMENTS (
+                GENOTYPE_AMPLICONS.out,
+                 MERGE_SEQS_FOR_GENOTYPING.out
+            )
+
         }
-
-        GENOTYPE_AMPLICONS (
-            ch_amplicon_reads.combine( FAIDX.out )
-        )
-
-        FILTER_ALIGNMENTS (
-            GENOTYPE_AMPLICONS.out,
-            CREATE_GENOTYPING_FASTA.out
-        )
 
         SORT_BAM (
             FILTER_ALIGNMENTS.out
