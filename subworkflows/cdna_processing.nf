@@ -21,8 +21,8 @@ workflow CDNA_PROCESSING {
                         ch_cdna_ref
                             .splitFasta( record: [id: true, seqString: true] )
                     )
-                    .map { nogdna_record, cdna_ref -> 
-                        tuple( nogdna_record.id, no_gdna_record.seqString, cdna_ref.id, cdna_ref.seqString )
+                    .map { no_gdna_record, cdna_ref -> 
+                        tuple( no_gdna_record.id, no_gdna_record.seqString, cdna_ref.id, cdna_ref.seqString )
                     }
             )
 

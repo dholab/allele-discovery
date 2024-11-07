@@ -50,8 +50,8 @@ workflow {
         .splitCsv( header: false, sep: "\t", strip: true )
         .map { row -> tuple( row[0], row[1], row[2] ) }
 
-    ch_mapping_reference_fasta = Channel
-        .fromPath ( params.mapping_reference_fasta )
+    // ch_mapping_reference_fasta = Channel
+    //     .fromPath ( params.mapping_reference_fasta )
     
     ch_guide_fasta = Channel
         .fromPath( params.guide_fasta )

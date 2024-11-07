@@ -20,7 +20,7 @@ requires = ["setuptools >= 40.8.0", "cffi >=1.15.0,!=1.17.0"]
 build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.setuptools]
-py-modules = ["scripts"]
+py-modules = ["bin"]
 
 [tool.pixi.pypi-dependencies]
 allele-discovery = { path = ".", editable = true }

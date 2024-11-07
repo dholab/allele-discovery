@@ -35,7 +35,7 @@ with open(OUTPUT_NAME, "w", newline="") as genotyping_csv:
 
     for sam_file in sam_files:
         # Get sample name by removing the .sam extension
-        sam_file_basename = Path(sam_file).name
+        sam_file_basename = Path(sam_file).name.replace(".noheaders", "")
         animal_name = re.sub(r"\.sam$", "", sam_file_basename)
 
         with open(sam_file) as tsvfile:
