@@ -2,34 +2,32 @@
 
 nextflow.enable.dsl = 2
 
-nextflow.enable.dsl = 2
-
-frontMatter = """
-    alleled: amplicon-based allele genotyping and discovery
-    =========================================================================
-    A bioinformatic pipeline that takes long, accurate amplicons reads and
-    uses them to perform genotyping and novel allele discovery. As of 2024,
-    the methods used here perform well with PacBio HiFi and reads, as well as
-    Nanopore reads generated with R10 chemistry and super-accuracy basecalling.
-    (version 0.1.0)
-    =========================================================================
-    """
-    .stripIndent()
-
-if (params.help) {
-    Utils.helpMessage(workflow, log, frontMatter)
-    exit 0
-}
-
-log.info frontMatter
-Utils.workflowDisplay(params, workflow, log, nextflow)
-
 
 include { PREPROCESSING } from "./workflows/preprocessing"
 include { ALLELE_DISCOVERY } from "./workflows/allele_discovery"
 include { GENOTYPING } from "./workflows/genotyping"
 
 workflow {
+
+    frontMatter = """
+        alleled: amplicon-based allele genotyping and discovery
+        =========================================================================
+        A bioinformatic pipeline that takes long, accurate amplicons reads and
+        uses them to perform genotyping and novel allele discovery. As of 2024,
+        the methods used here perform well with PacBio HiFi and reads, as well as
+        Nanopore reads generated with R10 chemistry and super-accuracy basecalling.
+        (version 0.1.0)
+        =========================================================================
+        """
+        .stripIndent()
+
+    if (params.help) {
+        Utils.helpMessage(workflow, log, frontMatter)
+        exit 0
+    }
+
+    log.info frontMatter
+    Utils.workflowDisplay(params, workflow, log, nextflow)
 
     // assertions to check that the required parameters are provided correctly
     assert params.input_dir :
@@ -116,18 +114,18 @@ workflow {
         ALLELE_DISCOVERY.out.cdna_matches
     )
 
-}
+    if ( params.email ) {
+        workflow.onComplete {
 
-if ( params.email ) {
-  workflow.onComplete {
+            def msg = """\
+                allele discovery and genotyping has finished running with the following settings:
 
-      def msg = """\
-          allele discovery and genotyping has finished running with the following settings:
+                ${Utils.workflowDisplay(params, workflow, log, nextflow)}
+                """
+                .stripIndent()
 
-          ${Utils.workflowDisplay(params, workflow, log, nextflow)}
-          """
-          .stripIndent()
+            sendMail(to: params.email, subject: 'alleled Execution Report', body: msg)
+        }
+    }
 
-      sendMail(to: params.email, subject: 'alleled Execution Report', body: msg)
-  }
 }

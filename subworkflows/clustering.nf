@@ -28,7 +28,7 @@ workflow CLUSTERING {
         MERGE_ALL_ANIMALS (
             RENAME_WITH_IDS
                 .out
-                .map { id, data -> data }
+                .map { _id, data -> data }
                 .collect()
         )
 

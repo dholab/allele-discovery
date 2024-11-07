@@ -25,15 +25,15 @@ workflow ENRICH_AMPLICONS {
 
         ORIENT_READS (
             VALIDATE_READS.out
-                .map { barcode, fastq, result -> tuple( barcode, file(fastq), file(fastq).countFastq() ) }
+                .map { barcode, fastq, _result -> tuple( barcode, file(fastq), file(fastq).countFastq() ) }
                 .filter { it[2] > params.min_total_reads }
-                .map { barcode, fastq, read_count -> tuple( barcode, file(fastq) ) },
+                .map { barcode, fastq, _read_count -> tuple( barcode, file(fastq) ) },
             ch_guide_fasta
         )
 
         FIND_COMPLETE_AMPLICONS (
             ORIENT_READS.out
-                .map { barcode, fastq -> fastq }
+                .map { _barcode, fastq -> fastq }
                 .combine ( ch_primer_sets )
         )
 
@@ -45,21 +45,21 @@ workflow ENRICH_AMPLICONS {
             TRIM_ENDS_TO_PRIMERS.out
                 .map { barcode, fastq -> tuple( barcode, file(fastq), file(fastq).countFastq() ) }
                 .filter { it[2] > params.min_total_reads }
-                .map { barcode, fastq, read_count -> tuple( barcode, file(fastq) ) },
+                .map { barcode, fastq, _read_count -> tuple( barcode, file(fastq) ) },
         )
 
         REMOVE_SHORT_READS (
             DEDUPLICATE_AMPLICONS.out
                 .map { barcode, fastq -> tuple( barcode, file(fastq), file(fastq).countFastq() ) }
                 .filter { it[2] > params.min_total_reads }
-                .map { barcode, fastq, read_count -> tuple( barcode, file(fastq) ) },
+                .map { barcode, fastq, _read_count -> tuple( barcode, file(fastq) ) },
         )
 
         EXTRACT_TOP_QUALITY (
             REMOVE_SHORT_READS.out
                 .map { sample_id, fastq -> tuple( sample_id, file(fastq), file(fastq).countFastq() ) }
                 .filter { it[2] >= params.best_read_count }
-                .map { barcode, fastq, read_count -> tuple( barcode, file(fastq) ) },
+                .map { barcode, fastq, _read_count -> tuple( barcode, file(fastq) ) },
         )
 
         AMPLICON_STATS (
