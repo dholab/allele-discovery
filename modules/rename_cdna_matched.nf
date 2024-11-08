@@ -20,10 +20,10 @@ process RENAME_CDNA_MATCHED_FASTA {
     import csv
 
     # read input FASTA line-by-line
-    for record in SeqIO.parse(${no_gdna_match}, "fasta"):
+    for record in SeqIO.parse("${no_gdna_match}", "fasta"):
 
         # parse file with gdna sequences that match cdna sequences
-        with open(${matches}) as tsvfile:
+        with open("${matches}") as tsvfile:
             reader = csv.reader(tsvfile, delimiter='\t')
             for row in reader:
 

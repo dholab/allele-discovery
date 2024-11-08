@@ -14,15 +14,19 @@ workflow CDNA_PROCESSING {
 
         if ( params.cdna_reference_fasta ) {
 
+            ch_not_gdna_records = ch_no_gdna_matches
+                .splitFasta( record: [id: true, seqString: true] )
+
+            ch_cdna_ref_records = ch_cdna_ref
+                .splitFasta( record: [id: true, seqString: true] )
+
+
             MAP_CLUSTERS_TO_CDNA (
-                ch_no_gdna_matches
-                    .splitFasta( record: [id: true, seqString: true] )
-                    .combine(
-                        ch_cdna_ref
-                            .splitFasta( record: [id: true, seqString: true] )
-                    )
-                    .map { no_gdna_record, cdna_ref -> 
-                        tuple( no_gdna_record.id, no_gdna_record.seqString, cdna_ref.id, cdna_ref.seqString )
+                ch_not_gdna_records
+                    .combine( ch_cdna_ref_records )
+                    .map { no_gdna_record, cdna_ref -> tuple(
+                        no_gdna_record.id, no_gdna_record.seqString, cdna_ref.id, cdna_ref.seqString
+                        )
                     }
             )
 
