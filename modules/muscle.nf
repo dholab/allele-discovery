@@ -1,5 +1,4 @@
 process MAP_CLUSTERS_TO_CDNA {
-
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
@@ -18,12 +17,9 @@ process MAP_CLUSTERS_TO_CDNA {
     | muscle -quiet \
     | grep "^ " | grep "\\*" -o | wc -l > !{query_id}_to_!{ref_id}.aln
     '''
-
 }
 
 process COLLECT_MUSCLE_RESULTS {
-
-
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
@@ -38,5 +34,4 @@ process COLLECT_MUSCLE_RESULTS {
     touch merged.aln && \
     find results -type f -name "*.aln" -exec cat {} + >> merged.aln
     """
-
 }
