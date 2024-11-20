@@ -1,5 +1,6 @@
 include {
     MAP_CLUSTERS_TO_CDNA ;
+    COLLECT_BATCHES;
     COLLECT_MUSCLE_RESULTS
 } from "../modules/muscle"
 include { FIND_CDNA_GDNA_MATCHES    } from "../modules/awk"
