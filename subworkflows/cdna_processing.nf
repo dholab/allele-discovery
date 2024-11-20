@@ -32,8 +32,12 @@ workflow CDNA_PROCESSING {
             }
         )
 
+        COLLECT_BATCHES(
+            MAP_CLUSTERS_TO_CDNA.out.buffer(size: 10_000, remainder: true)
+            )
+
         COLLECT_MUSCLE_RESULTS(
-            MAP_CLUSTERS_TO_CDNA.out.collect()
+            COLLECT_BATCHES.out.collect()
         )
 
         FIND_CDNA_GDNA_MATCHES(
