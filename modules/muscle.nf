@@ -19,6 +19,23 @@ process MAP_CLUSTERS_TO_CDNA {
     '''
 }
 
+process COLLECT_BATCHES {
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    input:
+    path "results/???.aln"
+
+    output:
+    path "merged.aln"
+
+    script:
+    """
+    touch merged.aln && \
+    find results -type f -name "*.aln" -exec cat {} + >> merged.aln
+    """
+}
+
 process COLLECT_MUSCLE_RESULTS {
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
