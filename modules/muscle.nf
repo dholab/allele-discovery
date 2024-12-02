@@ -8,15 +8,26 @@ process MAP_CLUSTERS_TO_CDNA {
     output:
     path "${query_id}_to_${ref_id}.aln"
 
-    shell:
+    script:
     query_seq_len = query_seq.toString().length()
     ref_seq_len = ref_seq.toString().length()
-    '''
-    echo "!{query_id}\t!{ref_id}\t!{query_seq_len}\t!{ref_seq_len}\t \
-    $(echo '>!{query_id}\n!{query_seq}\n>!{ref_id}\n!{ref_seq}')" \
-    | muscle -quiet \
-    | grep "^ " | grep "\\*" -o | wc -l > !{query_id}_to_!{ref_id}.aln
-    '''
+    """
+    # Prepare the sequences in FASTA format
+    sequences=">${query_id}
+    ${query_seq}
+    >${ref_id}
+    ${ref_seq}"
+
+    # Run MUSCLE alignment and count the number of matching nucleotides
+    match_count=\$(echo "\${sequences}" \
+    | muscle -maxiters 2 -quiet -clwstrict \
+    | grep "^ " | grep -o "\\*" | wc -l)
+
+    # Append the results to the output file in a tab-delimited format
+    touch ${query_id}_to_${ref_id}.aln
+    echo -e "${query_id}\t${ref_id}\t${query_seq_len}\t${ref_seq_len}\t\${match_count}" \
+    >> "${query_id}_to_${ref_id}.aln"
+    """
 }
 
 process COLLECT_BATCHES {

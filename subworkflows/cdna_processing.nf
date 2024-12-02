@@ -1,6 +1,6 @@
 include {
     MAP_CLUSTERS_TO_CDNA ;
-    COLLECT_BATCHES;
+    COLLECT_BATCHES ;
     COLLECT_MUSCLE_RESULTS
 } from "../modules/muscle"
 include { FIND_CDNA_GDNA_MATCHES    } from "../modules/awk"
@@ -11,7 +11,7 @@ include { VALIDATE_NOVEL_SEQUENCES  } from "../modules/seqkit"
 workflow CDNA_PROCESSING {
     take:
     ch_no_gdna_matches
-    ch_cdna_ref       
+    ch_cdna_ref
 
     main:
 
@@ -34,8 +34,8 @@ workflow CDNA_PROCESSING {
         )
 
         COLLECT_BATCHES(
-            MAP_CLUSTERS_TO_CDNA.out.buffer(size: 10_000, remainder: true)
-            )
+            MAP_CLUSTERS_TO_CDNA.out.buffer(size: 10000, remainder: true)
+        )
 
         COLLECT_MUSCLE_RESULTS(
             COLLECT_BATCHES.out.collect()
