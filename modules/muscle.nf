@@ -24,9 +24,8 @@ process MAP_CLUSTERS_TO_CDNA {
     | grep "^ " | grep -o "\\*" | wc -l)
 
     # Append the results to the output file in a tab-delimited format
-    touch ${query_id}_to_${ref_id}.aln
     echo -e "${query_id}\t${ref_id}\t${query_seq_len}\t${ref_seq_len}\t\${match_count}" \
-    >> "${query_id}_to_${ref_id}.aln"
+    > "${query_id}_to_${ref_id}.aln"
     """
 }
 
@@ -35,15 +34,14 @@ process COLLECT_BATCHES {
     maxRetries 2
 
     input:
-    path "results/???.aln"
+    path "results/*.aln"
 
     output:
     path "merged.aln"
 
     script:
     """
-    touch merged.aln && \
-    find results -type f -name "*.aln" -exec cat {} + >> merged.aln
+    cat results/*.aln > merged.aln
     """
 }
 
@@ -59,7 +57,6 @@ process COLLECT_MUSCLE_RESULTS {
 
     script:
     """
-    touch merged.aln && \
-    find results -type f -name "*.aln" -exec cat {} + >> merged.aln
+    cat results/*.aln > merged.aln
     """
 }
