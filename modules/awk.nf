@@ -9,9 +9,9 @@ process FIND_CDNA_GDNA_MATCHES {
     output:
     path "matches.aln"
 
-    shell:
-    '''
-    awk '{{if( $4 == $5  ) print $0}}\' !{cdna_identical} > matches.aln
-    '''
+    script:
+    """
+    awk '{{if( \$4 == \$5  ) print \$0}}' ${cdna_identical} > matches.aln
+    """
 
 }

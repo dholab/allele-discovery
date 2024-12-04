@@ -17,11 +17,15 @@ process MAP_CLUSTERS_TO_CDNA {
     ${query_seq}
     >${ref_id}
     ${ref_seq}"
+    echo \${sequences} > sequence_pair.fasta
 
     # Run MUSCLE alignment and count the number of matching nucleotides
-    match_count=\$(echo "\${sequences}" \
-    | muscle -maxiters 2 -quiet -clwstrict \
-    | grep "^ " | grep -o "\\*" | wc -l)
+    muscle -align sequence_pair.fasta -output aligned_pair.fasta
+    match_count=\$( cat aligned_pair.fasta \
+    | seqkit range -r -1:-1 \
+    | seqkit seq -s \
+    | tr -d '\n-' \
+    | wc -c)
 
     # Append the results to the output file in a tab-delimited format
     echo -e "${query_id}\t${ref_id}\t${query_seq_len}\t${ref_seq_len}\t\${match_count}" \

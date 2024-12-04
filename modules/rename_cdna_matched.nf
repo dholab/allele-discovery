@@ -19,6 +19,10 @@ process RENAME_CDNA_MATCHED_FASTA {
     from Bio.Seq import Seq
     import csv
 
+    # create an empty output file to append to
+    with open("cdna_matches.fasta", "w) as _:
+        pass
+
     # read input FASTA line-by-line
     for record in SeqIO.parse("${no_gdna_match}", "fasta"):
 
