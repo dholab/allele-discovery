@@ -13,14 +13,11 @@ process MAP_CLUSTERS_TO_CDNA {
     ref_seq_len = ref_seq.toString().length()
     """
     # Prepare the sequences in FASTA format
-    sequences=">${query_id}
-    ${query_seq}
-    >${ref_id}
-    ${ref_seq}"
-    echo \${sequences} > sequence_pair.fasta
+    echo ">${query_id}\n${query_seq}\n>${ref_id}\n${ref_seq}" \
+    > sequence_pair.fasta
 
     # Run MUSCLE alignment and count the number of matching nucleotides
-    muscle -align sequence_pair.fasta -output aligned_pair.fasta
+    muscle -super5 sequence_pair.fasta -output aligned_pair.fasta
     match_count=\$( cat aligned_pair.fasta \
     | seqkit range -r -1:-1 \
     | seqkit seq -s \

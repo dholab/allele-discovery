@@ -11,8 +11,9 @@ dependencies = [
     "pysam>=0.22.1",
     "snakemake>=7.32.4,<9",
     "pulp==2.7.0",
+    "pandas>=2.2.3",
 ]
-requires-python = ">= 3.8"
+requires-python = ">=3.9"
 version = "0.1.0"
 
 [build-system]
@@ -57,16 +58,18 @@ pandas = ">=2.2.3,<3"
 dev-dependencies = [
     "ipykernel>=6.29.5",
     "ipython>=8.12.3",
-    "jupyter>=0.6.4",
-    "mamba>=0.11.3",
     "marimo[sql]>=0.8.14",
-    "pandas>=2.0.3",
     "polars>=1.7.0",
     "pytest>=8.3.3",
-    "ruff",
     "tox>=4.18.1",
+    "numpy>1.24.4",
 ]
 compile-bytecode = true
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "basic"
 
 [project.scripts]
 "alleled" = "bin.__main__:main"

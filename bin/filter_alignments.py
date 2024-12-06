@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pysam",
+# ]
+# ///
 
 from __future__ import annotations
 
