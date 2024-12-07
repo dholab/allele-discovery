@@ -14,12 +14,12 @@ include { REMOVE_HEADERS            } from "../modules/bbmap"
 
 workflow PREPARE_GENOTYPES {
     take:
-    ch_allele_clusters     
-    ch_gdna_ref            
-    ch_novel_seqs          
-    ch_cdna_matches        
+    ch_allele_clusters
+    ch_gdna_ref
+    ch_novel_seqs
+    ch_cdna_matches
     ch_mapped_cdna_clusters
-    ch_amplicon_reads      
+    ch_amplicon_reads
 
     main:
 

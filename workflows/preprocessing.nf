@@ -1,4 +1,4 @@
-include { PUBLISH_COMMAND        } from "../modules/reporting"
+include { WORKFLOW_INTROSPECTION        } from "../subworkflows/workflow_introspection"
 include { ENRICH_AMPLICONS       } from "../subworkflows/enrich_amplicons"
 include { PREPARE_SEQUENCE_FILES } from "../subworkflows/prepare_sequence_files"
 include { CLUSTERING             } from "../subworkflows/clustering"
@@ -12,7 +12,7 @@ workflow PREPROCESSING {
 
     main:
 
-    PUBLISH_COMMAND()
+    WORKFLOW_INTROSPECTION()
 
     ENRICH_AMPLICONS(
         ch_raw_reads,
