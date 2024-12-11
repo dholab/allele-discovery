@@ -26,9 +26,9 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "-i",
-        "--input_sam",
+        "--input_bam",
         required=True,
-        help="Input SAM file (unsorted)",
+        help="Input BAM file (unsorted)",
     )
     parser.add_argument(
         "-r",
@@ -87,10 +87,10 @@ def is_soft_clipping_only_at_ends(cigar_tuples: list[tuple[int, int]]) -> bool:
 
     num_ops = len(cigar_tuples)
     soft_clip_op = 4
-    for idx, (op, _) in enumerate(cigar_tuples):
-        if op == soft_clip_op and idx != 0 and idx != num_ops - 1:  # Soft clipping
-            return False
-    return True
+    return all(
+        not (op == soft_clip_op and idx != 0 and idx != num_ops - 1)
+        for idx, (op, _) in enumerate(cigar_tuples)
+    )
 
 
 def has_no_substitutions(cigar_tuples: list[tuple[int, int]]) -> bool:
@@ -107,7 +107,7 @@ def has_no_substitutions(cigar_tuples: list[tuple[int, int]]) -> bool:
     return all(op != substitution_code for op, _ in cigar_tuples)
 
 
-def filter_alignments(input_sam: str, reference_fasta: str, output_bam: str) -> None:  # noqa: C901
+def filter_alignments(input_bam: str, reference_fasta: str, output_bam: str) -> None:  # noqa: C901
     """
     Filter alignments based on the specified criteria and write to output BAM.
 
@@ -120,15 +120,15 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_bam: str) -> 
 
     # Open input BAM
     try:
-        samfile = pysam.AlignmentFile(input_sam, "r")
+        bamfile = pysam.AlignmentFile(input_bam, "r")
     except FileNotFoundError:
-        sys.stderr.write(f"Error: Input BAM file '{input_sam}' not found.\n")
+        sys.stderr.write(f"Error: Input BAM file '{input_bam}' not found.\n")
         sys.exit(1)
 
     # Open output BAM (copy header from input)
-    outfile = pysam.AlignmentFile(output_bam, "wb", header=samfile.header)
+    outfile = pysam.AlignmentFile(output_bam, "wb", header=bamfile.header)
 
-    for read in samfile.fetch(until_eof=True):
+    for read in bamfile.fetch(until_eof=True):
         # Skip unmapped reads
         if read.is_unmapped:
             continue
@@ -166,13 +166,13 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_bam: str) -> 
             outfile.write(read)
 
     # Close files
-    samfile.close()
+    bamfile.close()
     outfile.close()
 
 
 def main() -> None:
     args = parse_arguments()
-    filter_alignments(args.input_sam, args.reference_fasta, args.output_bam)
+    filter_alignments(args.input_bam, args.reference_fasta, args.output_bam)
 
 
 if __name__ == "__main__":

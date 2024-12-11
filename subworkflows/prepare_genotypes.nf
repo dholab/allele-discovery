@@ -6,7 +6,7 @@ include {
 include { CREATE_GENOTYPING_FASTA   } from "../modules/create_genotyping_fasta"
 include {
     FAIDX ;
-    SORT_BAM
+    CONVERT_TO_BAM
 } from "../modules/samtools"
 include { GENOTYPE_AMPLICONS        } from "../modules/minimap2"
 include { FILTER_ALIGNMENTS         } from "../modules/filter_alignments"
@@ -50,40 +50,31 @@ workflow PREPARE_GENOTYPES {
         FAIDX(
             CREATE_GENOTYPING_FASTA.out
         )
-
-        GENOTYPE_AMPLICONS(
-            ch_amplicon_reads.combine(FAIDX.out)
-        )
-
-        FILTER_ALIGNMENTS(
-            GENOTYPE_AMPLICONS.out,
-            CREATE_GENOTYPING_FASTA.out
-        )
     }
     else {
 
         FAIDX(
             MERGE_SEQS_FOR_GENOTYPING.out
         )
-
-        GENOTYPE_AMPLICONS(
-            ch_amplicon_reads.combine(FAIDX.out)
-        )
-
-        FILTER_ALIGNMENTS(
-            GENOTYPE_AMPLICONS.out,
-            MERGE_SEQS_FOR_GENOTYPING.out
-        )
     }
 
-    SORT_BAM(
-        FILTER_ALIGNMENTS.out
+    GENOTYPE_AMPLICONS(
+        ch_amplicon_reads.combine(FAIDX.out)
+    )
+
+    CONVERT_TO_BAM(
+        GENOTYPE_AMPLICONS.out
     )
 
     REMOVE_HEADERS(
-        SORT_BAM.out
+        CONVERT_TO_BAM.out
+    )
+
+    FILTER_ALIGNMENTS(
+        CONVERT_TO_BAM.out,
+        MERGE_SEQS_FOR_GENOTYPING.out
     )
 
     emit:
-    REMOVE_HEADERS.out
+    FILTER_ALIGNMENTS.out
 }

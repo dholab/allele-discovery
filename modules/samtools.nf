@@ -38,6 +38,26 @@ process SORT_BAM {
 
 }
 
+process CONVERT_TO_BAM {
+
+	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+	maxRetries 2
+
+    input:
+    path(sam)
+
+    output:
+    path("${file_label}.bam")
+
+    script:
+	file_label = file(sam).getSimpleName()
+    """
+    samtools view -bS ${sam} \
+    -o ${file_label}.bam
+    """
+
+}
+
 process INDEX_BAM {
 
 	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }

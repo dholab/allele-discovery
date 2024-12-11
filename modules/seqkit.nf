@@ -191,7 +191,6 @@ process MERGE_SEQS_FOR_GENOTYPING {
     genotyping_seqs/ \
     -o potential_dups.fasta && \
     seqkit rmdup \
-    --by-name \
     potential_dups.fasta \
     -o refs_with_novel.fasta 
     """

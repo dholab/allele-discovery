@@ -15,7 +15,6 @@ process CLUSTAL_ALIGN {
 
     script:
     """
-    touch aligned.fasta distances.txt
     clustalo \
     --infile=${all_discovered} \
     --outfile=aligned.fasta \
