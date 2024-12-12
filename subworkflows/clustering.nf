@@ -10,7 +10,7 @@ include { RENAME_PUTATIVE_ALLELE_CLUSTERS } from "../modules/rename_cluster_seqs
 
 workflow CLUSTERING {
     take:
-    ch_amplicons    
+    ch_amplicons
     ch_indexed_guide
 
     main:

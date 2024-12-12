@@ -62,27 +62,26 @@ def main() -> None:
     # add cdna matches
     with open(args.alignment) as tsvfile:
         reader = csv.reader(tsvfile, delimiter="\t")
-    for row in reader:
-        classified[row[0]] = ["extend-cdna", utils.removeSpecialCharacters(row[1])]
+        for row in reader:
+            classified[row[0]] = ["extend-cdna", utils.removeSpecialCharacters(row[1])]
 
     # add novel matches
     if os.stat(args.closest_matches).st_size > 0:  # noqa: PTH116
         novel_df = pd.read_excel(args.closest_matches, index_col=0)
-
-    for _, row in novel_df.iterrows():
-        classified[str(row[0])] = [
-            "novel",
-            utils.removeSpecialCharacters(
-                row[1] + "|" + row[2] + "|" + row[3] + "|" + row[4] + "|" + row[5],
-            ),
-        ]
+        for _, row in novel_df.iterrows():
+            classified[str(row[0])] = [
+                "novel",
+                utils.removeSpecialCharacters(
+                    row[1] + "|" + row[2] + "|" + row[3] + "|" + row[4] + "|" + row[5],
+                ),
+            ]
 
     # create renamed FASTA file with updated names for genotyping
-    with open(args.novel_alleles, "a") as handle:
+    with open("classified.fasta", "a") as output_handle:
         # add IPD gDNA sequences
         with open(args.known_alleles) as input_handle:
             sequences = SeqIO.parse(input_handle, "fasta")
-            SeqIO.write(sequences, handle, "fasta")
+            SeqIO.write(sequences, output_handle, "fasta")
 
         # concatenate cDNA extensions and novel sequences with known IPD gDNA sequences
         # this enables genotyping against an expanded gDNA library even when there aren't a huge number of gDNA matches in this specific set of samples
@@ -90,18 +89,20 @@ def main() -> None:
             # get information for matching sequence
             allele_data = classified.get(record.name)
 
-            if allele_data is not None:
-                renamed_name = str(
-                    allele_data[1] + "_" + allele_data[0] + "_" + record.name,
-                )
-                renamed_seq = record.seq
-                new_record = SeqRecord(
-                    renamed_seq,
-                    id=renamed_name,
-                    description="",
-                )
+            if allele_data is None:
+                continue
 
-                SeqIO.write(new_record, handle, "fasta")
+            renamed_name = str(
+                allele_data[1] + "_" + allele_data[0] + "_" + record.name,
+            )
+            renamed_seq = record.seq
+            new_record = SeqRecord(
+                renamed_seq,
+                id=renamed_name,
+                description="",
+            )
+
+            SeqIO.write(new_record, output_handle, "fasta")
 
 
 if __name__ == "__main__":

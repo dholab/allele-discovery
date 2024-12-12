@@ -1,29 +1,27 @@
-include { PREPARE_GENOTYPES } from "../subworkflows/prepare_genotypes"
+include { PREPARE_GENOTYPES  } from "../subworkflows/prepare_genotypes"
 include { GENOTYPE_REPORTING } from "../subworkflows/genotype_reporting"
 
 workflow GENOTYPING {
-
     take:
-        ch_gdna_ref
-        ch_allele_clusters
-        ch_amplicon_reads
-        ch_mapped_cdna_clusters
-        ch_novel_seqs
-        ch_cdna_matches
+    ch_gdna_ref
+    ch_allele_clusters
+    ch_amplicon_reads
+    ch_mapped_cdna_clusters
+    ch_novel_seqs
+    ch_cdna_matches
 
     main:
 
-        PREPARE_GENOTYPES (
-            ch_allele_clusters,
-            ch_gdna_ref,
-            ch_novel_seqs,
-            ch_cdna_matches,
-            ch_mapped_cdna_clusters,
-            ch_amplicon_reads
-        )
+    PREPARE_GENOTYPES(
+        ch_allele_clusters,
+        ch_gdna_ref,
+        ch_novel_seqs,
+        ch_cdna_matches,
+        ch_mapped_cdna_clusters,
+        ch_amplicon_reads
+    )
 
-        GENOTYPE_REPORTING (
-            PREPARE_GENOTYPES.out
-        )
-
+    GENOTYPE_REPORTING(
+        PREPARE_GENOTYPES.out
+    )
 }

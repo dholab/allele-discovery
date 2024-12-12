@@ -16,11 +16,11 @@ include {
 
 workflow ALLELE_ANNOTATION {
     take:
-    ch_hla_mrna_ref      
+    ch_hla_mrna_ref
     ch_hla_cds_annotation
-    ch_novel_seqs        
-    ch_no_gdna_match     
-    ch_cdna_matched      
+    ch_novel_seqs
+    ch_no_gdna_match
+    ch_cdna_matched
 
     main:
 
@@ -41,11 +41,6 @@ workflow ALLELE_ANNOTATION {
     TRIM_ANNOTATIONS(
         PRELIM_EXONERATE_MERGE_CDS.out,
         ch_no_gdna_match
-    )
-
-    EXTRACT_NOVEL_SEQUENCES(
-        ch_no_gdna_match,
-        ch_cdna_matched
     )
 
     NOVEL_EXONERATE(

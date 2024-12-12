@@ -1,5 +1,5 @@
 include { PUBLISH_COMMAND } from "../modules/reporting"
 
-workflow PREPROCESSING {
+workflow WORKFLOW_INTROSPECTION {
     PUBLISH_COMMAND()
 }

@@ -6,9 +6,9 @@
 #     "pandas",
 # ]
 # ///
+from __future__ import annotations
 
 import argparse
-import os
 import re
 import sys
 from pathlib import Path
@@ -66,15 +66,13 @@ def main() -> None:
 
     # test if there is data in novel.fasta
     # create output files if empty
-
-    if os.stat(args.novel_alleles).st_size == 0:
+    if Path.stat(args.novel_alleles).st_size == 0:
         Path(args.match_excel).touch()
         Path(args.distances_tmp).touch()
         sys.exit()
 
     # import clustal omega distance file
     # remove spaces in sequence identifiers that makes distances.txt file human readable
-
     with open(args.distances) as fin, open(args.distances_tmp, "w") as fout:
         for line in fin:
             fout.write(re.sub(" +", " ", line))
@@ -88,36 +86,31 @@ def main() -> None:
         index_col=0,
     )
 
-    # get row index names
-    ordered_values = clustal_df.index.values.tolist()
-
     # use row_index names as column names
+    ordered_values = clustal_df.index.tolist()
     clustal_df.columns = ordered_values
     clustal_df.columns = clustal_df.columns.astype(str)
 
     # convert column names that are cdna_matches to cdna names
     # this makes it possible to glean lineages for novel alleles that are closest matches to cdna extensions
     cdna_dict = {
-        seq_record.name: seq_record.description.split(" ")[1]
-        for seq_record in SeqIO.parse(args.cdna_matches, "fasta")
+        seq_record.name: seq_record.description.split(" ")[1] for seq_record in SeqIO.parse(args.cdna_matches, "fasta")
     }
-    clustal_df.rename(cdna_dict, inplace=True, axis=1)
+    clustal_df = clustal_df.rename(cdna_dict, axis=1)
 
     # self-by-self comparisons always have a distance of 0.000000
     # for novel alleles, there will never be a perfect match to an existing sequence
     # so convert 0.000000	to 1 so self-matches don't report in nsmallest calculation
-    clustal_df.replace(0.000000, 1)
+    clustal_df = clustal_df.replace(0.000000, 1)
 
     # get names of sequences in novel.fasta
-    identifiers = [
-        seq_record.id for seq_record in SeqIO.parse(args.novel_alleles, "fasta")
-    ]
+    identifiers = [seq_record.id for seq_record in SeqIO.parse(args.novel_alleles, "fasta")]
 
     # create subset df with only novel fasta records as rows
     novel_df = clustal_df.loc[identifiers, :]
 
     # remove columns that are also novel alleles since these are not informative for naming
-    novel_df.drop(columns=identifiers, inplace=True)
+    novel_df = novel_df.drop(columns=identifiers)
 
     # filter on best three matches
     # sort on rows with lowest values (closest matches)
@@ -132,45 +125,52 @@ def main() -> None:
     top5_df = ranked_df.drop(columns=["Self"])
     top5_df.columns = top5_df.columns.astype(str)
 
+    # Rename the original index column (previously 'index' -> 'Query')
+    # Assuming the first column in top5_df is the reset index from ranked_df
+    old_index_col = top5_df.columns[0]
+    top5_df = top5_df.rename(columns={old_index_col: "Query"})
+
+    match_cols = ["Closest", "2", "3", "4", "5"]
+
+    def append_distance(row):
+        query = row["Query"]
+        for i, col in enumerate(match_cols):
+            match_name = row[col]
+            dist_val = novel_df.loc[query, match_name].round(3)
+            if i == 0:
+                print(dist_val)
+            row[col] = f"{match_name} ({dist_val})"
+        return row
+
+    top5_df = top5_df.apply(append_distance, axis=1)
+    # print(top5_df)
+
     # iterate over each entity in top5_df
     # add distance in parentheses after each
     # the logic took me a while to figure out
     # first lookup each coordinate in top5_df
     # then find the corresponding value in novel_df
     # and append it as a parenthetical
-
-    for index, row in top5_df.iterrows():
-        # update value of each combination
-        top5_df.at[index, "Closest"] = (
-            top5_df.at[index, "Closest"]
-            + " ("
-            + str(novel_df.at[row["0"], row["Closest"]].round(3))
-            + ")"
-        )
-        top5_df.at[index, "2"] = (
-            top5_df.at[index, "2"]
-            + " ("
-            + str(novel_df.at[row["0"], row["2"]].round(3))
-            + ")"
-        )
-        top5_df.at[index, "3"] = (
-            top5_df.at[index, "3"]
-            + " ("
-            + str(novel_df.at[row["0"], row["3"]].round(3))
-            + ")"
-        )
-        top5_df.at[index, "4"] = (
-            top5_df.at[index, "4"]
-            + " ("
-            + str(novel_df.at[row["0"], row["4"]].round(3))
-            + ")"
-        )
-        top5_df.at[index, "5"] = (
-            top5_df.at[index, "5"]
-            + " ("
-            + str(novel_df.at[row["0"], row["5"]].round(3))
-            + ")"
-        )
+    # for row_index, row_series in top5_df.iterrows():
+    #     # update value of each combination
+    #     top5_df.at[row_index, "Closest"] = (
+    #         top5_df.at[row_index, "Closest"]
+    #         + " ("
+    #         + str(novel_df.at[row_series["0"], row_series["Closest"]].round(3))
+    #         + ")"
+    #     )
+    #     top5_df.at[row_index, "2"] = (
+    #         top5_df.at[row_index, "2"] + " (" + str(novel_df.at[row_series["0"], row_series["2"]].round(3)) + ")"
+    #     )
+    #     top5_df.at[row_index, "3"] = (
+    #         top5_df.at[row_index, "3"] + " (" + str(novel_df.at[row_series["0"], row_series["3"]].round(3)) + ")"
+    #     )
+    #     top5_df.at[row_index, "4"] = (
+    #         top5_df.at[row_index, "4"] + " (" + str(novel_df.at[row_series["0"], row_series["4"]].round(3)) + ")"
+    #     )
+    #     top5_df.at[row_index, "5"] = (
+    #         top5_df.at[row_index, "5"] + " (" + str(novel_df.at[row_series["0"], row_series["5"]].round(3)) + ")"
+    #     )
 
     top5_df.to_excel(args.match_excel)
 

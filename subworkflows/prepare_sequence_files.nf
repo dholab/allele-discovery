@@ -6,7 +6,7 @@ include {
 
 workflow PREPARE_SEQUENCE_FILES {
     take:
-    ch_amplicons  
+    ch_amplicons
     ch_guide_fasta
 
     main:
