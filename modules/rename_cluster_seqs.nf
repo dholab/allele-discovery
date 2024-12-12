@@ -1,5 +1,7 @@
 process RENAME_PUTATIVE_ALLELE_CLUSTERS {
 
+    publishDir params.shared_clusters, mode: 'copy', overwrite: true
+
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
@@ -31,5 +33,4 @@ process RENAME_PUTATIVE_ALLELE_CLUSTERS {
             record.id = str(current_time) + '-' + str(idx)
             SeqIO.write(record, handle, "fasta")
     """
-
 }

@@ -1,5 +1,7 @@
 process CREATE_GENOTYPING_CSV {
 
+    publishDir params.genotyping, mode: 'copy', overwrite: true
+
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
@@ -13,12 +15,11 @@ process CREATE_GENOTYPING_CSV {
     """
     create_genotyping_csv.py
     """
-
 }
 
 process CREATE_GENOTYPING_PIVOT {
 
-    publishDir "${params.results}/genotyping", mode: 'copy', overwrite: true
+    publishDir params.genotyping, mode: 'copy', overwrite: true
 
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
@@ -33,5 +34,4 @@ process CREATE_GENOTYPING_PIVOT {
     """
     genotyping.py ${csv} "genotyping.xlsx"
     """
-
 }

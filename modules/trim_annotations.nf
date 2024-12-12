@@ -14,12 +14,11 @@ process TRIM_ANNOTATIONS {
     """
     trim_annotations.py ${prelim_annotations} ${no_gdna_matches}
     """
-
 }
 
 process NOVEL_TRIM_ANNOTATIONS {
 
-    publishDir "${params.results}/novel", mode: 'copy', overwrite: true
+    publishDir params.novel_annotations, mode: 'copy', overwrite: true
 
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
@@ -35,6 +34,4 @@ process NOVEL_TRIM_ANNOTATIONS {
     """
     trim_annotations.py ${prelim_gff} ${no_gdna_match}
     """
-
 }
-

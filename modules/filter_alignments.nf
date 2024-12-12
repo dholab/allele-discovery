@@ -1,26 +1,26 @@
 process FILTER_ALIGNMENTS {
 
-	tag "${file_label}"
+    tag "${file_label}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    publishDir params.filtered_geno, mode: 'copy', overwrite: true
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     input:
-    path sam
+    path bam
     each path(refseq)
 
     output:
-    path("${file_label}.filtered.bam")
+    path "${file_label}.filtered.bam"
 
     script:
-	file_label = file(sam).getSimpleName()
+    file_label = file(bam).getSimpleName()
     """
 	samtools faidx ${refseq} && \
     filter_alignments.py \
-    --input_sam ${sam} \
+    --input_bam ${bam} \
     --reference_fasta ${refseq} \
     --output_bam ${file_label}.filtered.bam
     """
-
 }
-

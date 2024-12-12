@@ -16,9 +16,9 @@ process MAP_CLUSTERS_TO_FULL_LENGTH_GDNA {
     """
     minimap2 \
     -t ${task.cpus} \
+    -ax splice -N 10000 \
     ${gdna_reference_fasta} \
     ${putative_alleles} \
-    -ax splice -N 10000 \
     > "all_mappings.sam"
     """
 

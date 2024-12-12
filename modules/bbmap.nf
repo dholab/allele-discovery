@@ -2,131 +2,129 @@ process CLUMP_READS {
 
     /* */
 
-	tag "${sample_id}"
+    tag "${sample_id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
-	cpus 4
+    cpus 4
 
-	input:
-	tuple val(sample_id), path(reads)
+    input:
+    tuple val(sample_id), path(reads)
 
-	output:
+    output:
     tuple val(sample_id), path("${sample_id}.merged.fastq.gz")
 
-	script:
-	"""
+    script:
+    """
 	clumpify.sh in=${reads} out=${sample_id}.merged.fastq.gz t=${task.cpus} reorder
 	"""
-
 }
 
 process DEDUPLICATE_AMPLICONS {
 
     /* */
 
-	tag "${sample_id}"
+    tag "${sample_id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 2
 
-	input:
-	tuple val(sample_id), path(amplicons)
+    input:
+    tuple val(sample_id), path(amplicons)
 
-	output:
-	tuple val(sample_id), path("${sample_id}.amplicons.deduped.fastq.gz")
+    output:
+    tuple val(sample_id), path("${sample_id}.amplicons.deduped.fastq.gz")
 
-	script:
-	"""
+    script:
+    """
     dedupe.sh \
     in=${amplicons} \
     out=${sample_id}.amplicons.deduped.fastq.gz \
     threads=${task.cpus}
     """
-
 }
 
 process DEDUP_CLUSTERS {
 
     /* */
 
-	tag "${sample_id}"
+    tag "${sample_id}"
+    publishDir params.deduped_clusters, mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 2
 
-	input:
-	tuple val(sample_id), path(clusters)
+    input:
+    tuple val(sample_id), path(clusters)
 
-	output:
-	tuple val(sample_id), path("${sample_id}.clusters.deduped.fasta")
+    output:
+    tuple val(sample_id), path("${sample_id}.clusters.deduped.fasta")
 
-	script:
-	"""
+    script:
+    """
     dedupe.sh -Xmx8g ow=t \
     in=${clusters} \
     outbest=${sample_id}.clusters.deduped.fasta \
     fo c \
     threads=${task.cpus}
     """
-
 }
 
 process REMOVE_SHORT_READS {
 
     /* */
 
-	tag "${sample_id}"
+    tag "${sample_id}"
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 2
 
-	input:
-	tuple val(sample_id), path(amplicons)
+    input:
+    tuple val(sample_id), path(amplicons)
 
-	output:
-	tuple val(sample_id), path("${sample_id}.amplicons.no_short.fastq")
+    output:
+    tuple val(sample_id), path("${sample_id}.amplicons.no_short.fastq")
 
-	script:
-	"""
+    script:
+    """
     reformat.sh \
     in=${amplicons} \
     out=${sample_id}.amplicons.no_short.fastq \
     minlength=${params.min_read_length} \
     threads=${task.cpus}
     """
-
 }
 
 process RENAME_WITH_IDS {
 
     /* */
 
-	tag "${sample_id}"
+    tag "${sample_id}"
+    publishDir params.top_quality, mode: 'copy', overwrite: true
 
-	errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-	maxRetries 2
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
 
     cpus 4
 
-	input:
-	tuple val(sample_id), path(sequences)
+    input:
+    tuple val(sample_id), path(sequences)
 
-	output:
-	tuple val(sample_id), path("${sample_id}.renamed.fast*")
+    output:
+    tuple val(sample_id), path("${sample_id}.amplicons.labelled.fast*")
 
-	script:
-    output_ext = file(sequences).contains(".fasta") || file(sequences).contains(".fa") ?
-    "fasta" :
-    "fastq"
-	"""
+    script:
+    output_ext = file(sequences).contains(".fasta") || file(sequences).contains(".fa")
+        ? "fasta"
+        : "fastq"
+    """
     rename.sh -Xmx1g \
     in=${sequences} \
     out="${sample_id}.renamed.${output_ext}" \
@@ -134,7 +132,6 @@ process RENAME_WITH_IDS {
     addprefix=t \
     threads=${task.cpus}
     """
-
 }
 
 process SHARED_ANIMALS {
@@ -148,7 +145,7 @@ process SHARED_ANIMALS {
     path merged_clusters
 
     output:
-    path("putative_alleles_temp.fasta")
+    path "putative_alleles_temp.fasta"
 
     script:
     """
@@ -172,18 +169,19 @@ process SHARED_ANIMALS {
         out=putative_alleles_temp.fasta \
         ac=t threads=${task.cpus}
     """
-
 }
 
 
 process FILTER_EXACT_GDNA_MATCHES {
 
+    publishDir params.exact_gdna_matches, mode: 'copy', overwrite: true
+
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
     input:
-    path(all_mappings)
-    path(putative_alleles)
+    path all_mappings
+    path putative_alleles
     path gdna_ref
 
     output:
@@ -204,7 +202,6 @@ process FILTER_EXACT_GDNA_MATCHES {
 	names=gdna_match.sam \
 	out=no_gdna_match.fasta
     """
-
 }
 
 process EXTRACT_NOVEL_SEQUENCES {
@@ -225,7 +222,6 @@ process EXTRACT_NOVEL_SEQUENCES {
     """
     mapPacBio.sh in=${no_gdna_match} ref=${cdna_matches} outu=novel.fasta subfilter=0
     """
-
 }
 
 process REMOVE_HEADERS {
@@ -236,16 +232,14 @@ process REMOVE_HEADERS {
     cpus 3
 
     input:
-    path bam
+    path sam
 
     output:
-    path "*.noheaders.sam"
+    path "*.noheaders.bam"
 
     script:
-    file_label = file(bam).getSimpleName()
+    file_label = file(sam).getSimpleName()
     """
-    reformat.sh in=${bam} out=${file_label}.noheaders.sam noheader=t -Xmx8g
+    reformat.sh in=${sam} out=${file_label}.noheaders.bam noheader=t -Xmx8g
     """
-
 }
-

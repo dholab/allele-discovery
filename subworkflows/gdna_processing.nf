@@ -3,8 +3,8 @@ include { FILTER_EXACT_GDNA_MATCHES        } from "../modules/bbmap"
 
 workflow GDNA_PROCESSING {
     take:
-    ch_allele_clusters
     ch_gdna_ref
+    ch_allele_clusters
 
     main:
 

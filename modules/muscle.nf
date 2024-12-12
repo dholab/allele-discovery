@@ -47,6 +47,9 @@ process COLLECT_BATCHES {
 }
 
 process COLLECT_MUSCLE_RESULTS {
+    
+    publishDir params.muscle_results, mode: 'copy', overwrite: true
+
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 

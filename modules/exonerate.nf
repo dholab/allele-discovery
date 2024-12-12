@@ -29,6 +29,8 @@ process PRELIMINARY_EXONERATE {
 
 process NOVEL_EXONERATE {
 
+    publishDir params.novel_annotations, mode: 'copy', overwrite: true
+    
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
