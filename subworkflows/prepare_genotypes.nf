@@ -62,12 +62,8 @@ workflow PREPARE_GENOTYPES {
         ch_amplicon_reads.combine(FAIDX.out)
     )
 
-    CONVERT_TO_BAM(
-        GENOTYPE_AMPLICONS.out
-    )
-
     REMOVE_HEADERS(
-        CONVERT_TO_BAM.out
+        GENOTYPE_AMPLICONS.out
     )
 
     FILTER_ALIGNMENTS(

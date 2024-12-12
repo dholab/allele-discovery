@@ -32,7 +32,7 @@ def main() -> None:
                 # test if name of sequence in cdna match file matches gdna sequence name
                 if row[0] == record.name:
                     # update name of sequence in output file
-                    record.id = row[0] + "|" + row[1]
+                    record.description = row[0] + "|" + row[1]
 
                     # write to file
                     with open("cdna_matches.fasta", "w") as handle:
