@@ -4,10 +4,7 @@ include {
     PARSE_DISTANCES
 } from "../modules/clustalo"
 include { CREATE_GENOTYPING_FASTA   } from "../modules/create_genotyping_fasta"
-include {
-    FAIDX ;
-    CONVERT_TO_BAM
-} from "../modules/samtools"
+include { FAIDX                     } from "../modules/samtools"
 include { GENOTYPE_AMPLICONS        } from "../modules/minimap2"
 include { FILTER_ALIGNMENTS         } from "../modules/filter_alignments"
 include { REMOVE_HEADERS            } from "../modules/bbmap"
@@ -67,7 +64,7 @@ workflow PREPARE_GENOTYPES {
     )
 
     FILTER_ALIGNMENTS(
-        CONVERT_TO_BAM.out,
+        REMOVE_HEADERS.out,
         MERGE_SEQS_FOR_GENOTYPING.out
     )
 
