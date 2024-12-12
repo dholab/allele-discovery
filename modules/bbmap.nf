@@ -118,16 +118,16 @@ process RENAME_WITH_IDS {
     tuple val(sample_id), path(sequences)
 
     output:
-    tuple val(sample_id), path("${sample_id}.amplicons.labeled.fast*")
+    tuple val(sample_id), path("${sample_id}.amplicons.labeled.f*.gz")
 
     script:
-    output_ext = file(sequences).contains(".fasta") || file(sequences).contains(".fa")
-        ? "fasta"
-        : "fastq"
+    output_ext = file(sequences).contains(".fastq") || file(sequences).contains(".fq")
+        ? "fastq"
+        : "fasta"
     """
     rename.sh -Xmx1g \
     in=${sequences} \
-    out="${sample_id}.amplicons.labeled.${output_ext}" \
+    out="${sample_id}.amplicons.labeled.${output_ext}.gz" \
     prefix=${sample_id} \
     addprefix=t \
     threads=${task.cpus}
