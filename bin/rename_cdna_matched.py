@@ -13,9 +13,7 @@ from Bio import SeqIO
 
 
 def main() -> None:
-    assert (
-        len(sys.argv) > 1
-    ), "Usage: python3 rename_cdna_matched.py <cdna matches fasta> <matches tsv>"
+    assert len(sys.argv) > 1, "Usage: python3 rename_cdna_matched.py <cdna matches fasta> <matches tsv>"
 
     # pull the paths to the required input path from the command line
     cdna_match_fasta = sys.argv[1]

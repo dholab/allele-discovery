@@ -23,7 +23,6 @@ process FIND_COMPLETE_AMPLICONS {
     --threads ${task.cpus} \
     --max-mismatch ${params.max_mismatch} \
     --by-seq \
-    --use-regexp \
     --pattern ${forward_primer},${reverse_primer} \
     -o ${sample_id}.${amplicon_label}_amplicons.fastq.gz
     """
@@ -136,6 +135,7 @@ process MERGE_ALL_ANIMALS {
   script:
   """
   seqkit scat \
+  --format fasta \
   --find-only \
   --threads ${task.cpus} \
   per_animal_clusters/ \
