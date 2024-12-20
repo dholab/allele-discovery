@@ -8,19 +8,19 @@ process FILTER_ALIGNMENTS {
     maxRetries 2
 
     input:
-    path bam
+    path sam
     each path(refseq)
 
     output:
-    path "${file_label}.filtered.bam"
+    path "${file_label}.filtered.sam"
 
     script:
-    file_label = file(bam).getSimpleName()
+    file_label = file(sam).getSimpleName()
     """
 	samtools faidx ${refseq} && \
     filter_alignments.py \
-    --input_bam ${bam} \
+    --input_bam ${sam} \
     --reference_fasta ${refseq} \
-    --output_bam ${file_label}.filtered.bam
+    --output_bam ${file_label}.filtered.sam
     """
 }

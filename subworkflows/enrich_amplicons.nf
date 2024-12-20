@@ -7,7 +7,8 @@ include {
     AMPLICON_STATS;
     FIND_COMPLETE_AMPLICONS;
     TRIM_ENDS_TO_PRIMERS;
-    MERGE_BY_SAMPLE;
+    MERGE_TOP_AMPLICONS_PER_SAMPLE;
+    MERGE_ALL_AMPLICONS_PER_SAMPLE; 
 } from "../modules/seqkit"
 
 workflow ENRICH_AMPLICONS {
@@ -54,19 +55,24 @@ workflow ENRICH_AMPLICONS {
             DEDUPLICATE_AMPLICONS.out
         )
 
+        AMPLICON_STATS (
+            REMOVE_SHORT_READS.out
+        )
+
         EXTRACT_TOP_QUALITY (
             REMOVE_SHORT_READS.out
         )
 
-        AMPLICON_STATS (
-            EXTRACT_TOP_QUALITY.out
+        MERGE_ALL_AMPLICONS_PER_SAMPLE (
+            REMOVE_SHORT_READS.out.groupTuple( by: 0 )
         )
 
-        MERGE_BY_SAMPLE (
+        MERGE_TOP_AMPLICONS_PER_SAMPLE (
             EXTRACT_TOP_QUALITY.out.groupTuple( by: 0 )
         )
 
     emit:
-        MERGE_BY_SAMPLE.out
+        top_amplicons = MERGE_TOP_AMPLICONS_PER_SAMPLE.out
+        all_amplicons = MERGE_ALL_AMPLICONS_PER_SAMPLE.out
 
 } 

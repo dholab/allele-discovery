@@ -88,7 +88,34 @@ process AMPLICON_STATS {
   """
 }
 
-process MERGE_BY_SAMPLE {
+process MERGE_TOP_AMPLICONS_PER_SAMPLE {
+
+  /* */
+
+  tag "${sample_id}"
+
+  errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+  maxRetries 2
+
+  cpus 4
+
+  input:
+  tuple val(sample_id), path("fastqs/????.fastq")
+
+  output:
+  tuple val(sample_id), path("${sample_id}.amplicons.fastq.gz")
+
+  script:
+  """
+  seqkit scat \
+  --find-only \
+  --threads ${task.cpus} \
+  fastqs/ \
+  | bgzip -o ${sample_id}.amplicons.fastq.gz
+  """
+}
+
+process MERGE_ALL_AMPLICONS_PER_SAMPLE {
 
   /* */
 

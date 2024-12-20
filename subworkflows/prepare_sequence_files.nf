@@ -1,4 +1,4 @@
-include { RENAME_WITH_IDS } from "../modules/bbmap"
+include { RENAME_AMPLICONS_WITH_IDS } from "../modules/bbmap"
 include {
     FAIDX ;
     FQIDX
@@ -11,12 +11,12 @@ workflow PREPARE_SEQUENCE_FILES {
 
     main:
 
-    RENAME_WITH_IDS(
+    RENAME_AMPLICONS_WITH_IDS(
         ch_amplicons
     )
 
     FQIDX(
-        RENAME_WITH_IDS.out
+        RENAME_AMPLICONS_WITH_IDS.out
     )
 
     FAIDX(

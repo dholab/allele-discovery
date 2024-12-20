@@ -36,14 +36,16 @@ process DEDUPLICATE_AMPLICONS {
     tuple val(sample_id), path(amplicons)
 
     output:
-    tuple val(sample_id), path("${sample_id}.amplicons.deduped.fastq.gz")
+    tuple val(sample_id), path("${basename}.deduped.fastq.gz")
 
     script:
+    basename = file(amplicons).getBaseName().replace(".fastq", "").replace(".gz", "")
     """
     dedupe.sh \
     in=${amplicons} \
-    out=${sample_id}.amplicons.deduped.fastq.gz \
-    threads=${task.cpus}
+    out=${basename}.deduped.fastq.gz \
+    threads=${task.cpus} \
+    -Xmx3g
     """
 }
 
@@ -90,19 +92,20 @@ process REMOVE_SHORT_READS {
     tuple val(sample_id), path(amplicons)
 
     output:
-    tuple val(sample_id), path("${sample_id}.amplicons.no_short.fastq")
+    tuple val(sample_id), path("${basename}.no_short.fastq")
 
     script:
+    basename = file(amplicons).getBaseName().replace(".fastq", "").replace(".gz", "")
     """
     reformat.sh \
     in=${amplicons} \
-    out=${sample_id}.amplicons.no_short.fastq \
+    out=${basename}.no_short.fastq \
     minlength=${params.min_read_length} \
     threads=${task.cpus}
     """
 }
 
-process RENAME_WITH_IDS {
+process RENAME_AMPLICONS_WITH_IDS {
 
     /* */
 
@@ -118,16 +121,42 @@ process RENAME_WITH_IDS {
     tuple val(sample_id), path(sequences)
 
     output:
-    tuple val(sample_id), path("${sample_id}${added_context}.labeled.f*")
+    tuple val(sample_id), path("${sample_id}.amplicons.labeled.fastq")
 
     script:
-    output_check = file(sequences).getName().contains(".fastq") || file(sequences).getName().contains(".fq")
-    output_ext = output_check ? "fastq" : "fasta"
-    added_context = output_check ? ".amplicons" : ""
     """
     rename.sh -Xmx1g \
     in=${sequences} \
-    out="${sample_id}${added_context}.labeled.${output_ext}" \
+    out="${sample_id}.amplicons.labeled.fastq \
+    prefix=${sample_id} \
+    addprefix=t \
+    threads=${task.cpus}
+    """
+}
+
+process RENAME_CLUSTERS_WITH_IDS {
+
+    /* */
+
+    tag "${sample_id}"
+    publishDir params.deduped_clusters, mode: 'copy', overwrite: true
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    cpus 4
+
+    input:
+    tuple val(sample_id), path(sequences)
+
+    output:
+    tuple val(sample_id), path("${sample_id}.clusters.labeled.fasta")
+
+    script:
+    """
+    rename.sh -Xmx1g \
+    in=${sequences} \
+    out="${sample_id}.clusters.labeled.fasta \
     prefix=${sample_id} \
     addprefix=t \
     threads=${task.cpus}

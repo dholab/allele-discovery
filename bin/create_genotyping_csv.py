@@ -41,6 +41,9 @@ with open(OUTPUT_NAME, "w", newline="") as genotyping_csv:
         with open(sam_file) as tsvfile:
             reader = csv.reader(tsvfile, delimiter="\t")
             for row in reader:
+                if row[0].startswith("@"):
+                    continue
+
                 # Ensure that the row has at least 3 columns
                 valid_column_count = 3
                 if len(row) < valid_column_count:

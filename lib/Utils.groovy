@@ -48,7 +48,6 @@ class Utils {
                 Input FASTQ directory       : ${params.input_dir ?: ""}
                 TSV of primer pairs         : ${params.primer_tsv ?: ""}
                 PBAA guide FASTA            : ${params.guide_fasta ?: ""}
-                Orientation allele          : ${params.mapping_reference_fasta ?: ""}
                 gDNA reference FASTA        : ${params.gdna_reference_fasta ?: ""}
                 cDNA reference FASTA        : ${params.cdna_reference_fasta ?: ""}
                 mRNA reference              : ${params.hla_mrna_reference ?: ""}

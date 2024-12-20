@@ -1,7 +1,7 @@
 include { RUN_PBAA                        } from "../modules/pacbio"
 include {
     DEDUP_CLUSTERS ;
-    RENAME_WITH_IDS ;
+    RENAME_CLUSTERS_WITH_IDS ;
     SHARED_ANIMALS
 } from "../modules/bbmap"
 include { MERGE_ALL_ANIMALS               } from "../modules/seqkit"
@@ -32,12 +32,12 @@ workflow CLUSTERING {
         RUN_PBAA.out
     )
 
-    RENAME_WITH_IDS(
+    RENAME_CLUSTERS_WITH_IDS(
         DEDUP_CLUSTERS.out
     )
 
     MERGE_ALL_ANIMALS(
-        RENAME_WITH_IDS.out.map { _id, data -> data }.collect()
+        RENAME_CLUSTERS_WITH_IDS.out.map { _id, data -> data }.collect()
     )
 
     SHARED_ANIMALS(
