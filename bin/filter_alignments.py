@@ -27,7 +27,7 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "-i",
-        "--input_bam",
+        "--input_sam",
         required=True,
         help="Input SAM file (unsorted)",
     )
@@ -39,7 +39,7 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "-o",
-        "--output_bam",
+        "--output_sam",
         required=True,
         help="Output filtered SAM file",
     )
@@ -107,12 +107,12 @@ def has_no_substitutions(cigar_tuples: list[tuple[int, int]]) -> bool:
 
 def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> None:  # noqa: C901
     """
-    Filter alignments based on the specified criteria and write to output BAM.
+    Filter alignments based on the specified criteria and write to output SAM.
 
     Args:
-        input_bam (str): Path to the input BAM file.
+        input_sam (str): Path to the input SAM file.
         reference_fasta (str): Path to the reference FASTA file.
-        output_bam (str): Path to the output filtered BAM file.
+        output_sam (str): Path to the output filtered SAM file.
     """
     ref_lengths = load_reference_lengths(reference_fasta)
 
@@ -186,7 +186,7 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
 
 def main() -> None:
     args = parse_arguments()
-    filter_alignments(args.input_sam, args.reference_fasta, args.output_bam)
+    filter_alignments(args.input_sam, args.reference_fasta, args.output_sam)
 
 
 if __name__ == "__main__":
