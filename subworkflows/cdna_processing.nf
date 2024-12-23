@@ -1,7 +1,7 @@
 include {
     MAP_CLUSTERS_TO_CDNA ;
-    COLLECT_BATCHES ;
-    COLLECT_MUSCLE_RESULTS
+    COLLECT_INTERMEDIATE_BATCHES ;
+    COLLECT_FINAL_BATCHES
 } from "../modules/muscle"
 include { FIND_CDNA_GDNA_MATCHES    } from "../modules/awk"
 include { RENAME_CDNA_MATCHED_FASTA } from "../modules/rename_cdna_matched"
@@ -33,16 +33,16 @@ workflow CDNA_PROCESSING {
             }
         )
 
-        COLLECT_BATCHES(
-            MAP_CLUSTERS_TO_CDNA.out.buffer(size: 10000, remainder: true)
+        COLLECT_INTERMEDIATE_BATCHES(
+            MAP_CLUSTERS_TO_CDNA.out.buffer(size: 1000, remainder: true)
         )
 
-        COLLECT_MUSCLE_RESULTS(
-            COLLECT_BATCHES.out.collect()
+        COLLECT_FINAL_BATCHES(
+            COLLECT_INTERMEDIATE_BATCHES.out.collect()
         )
 
         FIND_CDNA_GDNA_MATCHES(
-            COLLECT_MUSCLE_RESULTS.out
+            COLLECT_FINAL_BATCHES.out
         )
 
         RENAME_CDNA_MATCHED_FASTA(

@@ -77,7 +77,7 @@ def main() -> None:
             ]
 
     # create renamed FASTA file with updated names for genotyping
-    with open("classified.fasta", "a") as output_handle:
+    with open("classification.fasta", "a") as output_handle:
         # add IPD gDNA sequences
         with open(args.known_alleles) as input_handle:
             sequences = SeqIO.parse(input_handle, "fasta")

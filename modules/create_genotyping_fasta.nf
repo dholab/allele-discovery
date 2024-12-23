@@ -10,7 +10,7 @@ process CREATE_GENOTYPING_FASTA {
     path novel_closest_matches
 
     output:
-    path "classified.fasta"
+    path "*.fasta"
 
     script:
     """

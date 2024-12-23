@@ -30,37 +30,38 @@ process MAP_CLUSTERS_TO_CDNA {
     """
 }
 
-process COLLECT_BATCHES {
+process COLLECT_INTERMEDIATE_BATCHES {
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
     input:
-    path "results/*.aln"
+    path all_files_list, stageAs: "unmerged/*"
 
     output:
     path "merged.aln"
 
     script:
     """
-    cat results/*.aln > merged.aln
+    
+    echo "Staged ${all_files_list.size()} files..."
+    cat unmerged/*.aln > merged.aln
     """
 }
 
-process COLLECT_MUSCLE_RESULTS {
-    
-    publishDir params.muscle_results, mode: 'copy', overwrite: true
-
+process COLLECT_FINAL_BATCHES {
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2
 
     input:
-    path "results/???.aln"
+    path all_files_list, stageAs: "unmerged/???.aln"
 
     output:
     path "merged.aln"
 
     script:
     """
-    cat results/*.aln > merged.aln
+    
+    echo "Staged ${all_files_list.size()} files..."
+    cat unmerged/*.aln > merged.aln
     """
 }

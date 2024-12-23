@@ -19,8 +19,8 @@ process FILTER_ALIGNMENTS {
     """
 	samtools faidx ${refseq} && \
     filter_alignments.py \
-    --input_bam ${sam} \
+    --input_sam ${sam} \
     --reference_fasta ${refseq} \
-    --output_bam ${file_label}.filtered.sam
+    --output_sam ${file_label}.filtered.sam
     """
 }

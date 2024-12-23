@@ -12,6 +12,7 @@ import argparse
 import sys
 
 import pysam
+from loguru import logger
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -125,46 +126,62 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
     # Open output SAM (copy header from input)
     outfile = pysam.AlignmentFile(output_sam, "w", header=samfile.header)
 
+    filtered_tally = 0
+    retained_tally = 0
     for read in samfile.fetch(until_eof=True):
         # Skip unmapped reads
         if read.is_unmapped:
+            filtered_tally += 1
             continue
 
         # Check for soft clipping only at the ends in CIGAR
         if read.cigartuples is None:
+            filtered_tally += 1
             continue
 
         if not is_soft_clipping_only_at_ends(read.cigartuples):
+            filtered_tally += 1
             continue
 
         # Ensure no substitutions ('X' operations) in CIGAR
         if not has_no_substitutions(read.cigartuples):
+            filtered_tally += 1
             continue
 
         # Check if alignment starts at position 1 (0-based)
         if read.reference_start != 0:
+            filtered_tally += 1
             continue
 
         # Calculate alignment length (sum of M, =, X operations)
         aln_length = 0
         for op, length in read.cigartuples:
-            if op in [0, 7, 8]:  # M, =, X
-                aln_length += length
+            if op not in [0, 7, 8]:  # M, =, X
+                filtered_tally += 1
+                continue
+            aln_length += length
 
         # Get reference length
         ref_name = read.reference_name
         ref_length = ref_lengths.get(str(ref_name))
         if ref_length is None:
             # Reference name not found in reference lengths
+            filtered_tally += 1
             continue
 
         # Check if alignment spans the entire reference
         if aln_length == ref_length:
+            retained_tally += 1
             outfile.write(read)
 
     # Close files
     samfile.close()
     outfile.close()
+
+    # log out the results
+    logger.info(
+        f"Filtered {filtered_tally} reads from the input reads, leaving {retained_tally} behind. In all, {(filtered_tally / (filtered_tally + retained_tally)) * 100}% of reads were filtered and will thus not be included in the final genotyping report.",
+    )
 
 
 def main() -> None:

@@ -127,7 +127,7 @@ process RENAME_AMPLICONS_WITH_IDS {
     """
     rename.sh -Xmx1g \
     in=${sequences} \
-    out="${sample_id}.amplicons.labeled.fastq \
+    out=${sample_id}.amplicons.labeled.fastq \
     prefix=${sample_id} \
     addprefix=t \
     threads=${task.cpus}
@@ -156,7 +156,7 @@ process RENAME_CLUSTERS_WITH_IDS {
     """
     rename.sh -Xmx1g \
     in=${sequences} \
-    out="${sample_id}.clusters.labeled.fasta \
+    out=${sample_id}.clusters.labeled.fasta \
     prefix=${sample_id} \
     addprefix=t \
     threads=${task.cpus}
