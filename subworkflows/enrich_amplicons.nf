@@ -56,7 +56,7 @@ workflow ENRICH_AMPLICONS {
         )
 
         AMPLICON_STATS (
-            REMOVE_SHORT_READS.out
+            REMOVE_SHORT_READS.out.groupTuple( by: 0 )
         )
 
         EXTRACT_TOP_QUALITY (

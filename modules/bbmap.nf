@@ -54,7 +54,6 @@ process DEDUP_CLUSTERS {
     /* */
 
     tag "${sample_id}"
-    publishDir params.deduped_clusters, mode: 'copy', overwrite: true
 
     errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
     maxRetries 2

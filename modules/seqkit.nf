@@ -84,7 +84,7 @@ process AMPLICON_STATS {
   seqkit stats \
   --threads ${task.cpus} \
   --all --basename --tabular \
-  amplicons/*.fastq* > ${sample_id}.per_amplicon_stats.tsv
+  amplicons/*.f*q* > ${sample_id}.per_amplicon_stats.tsv
   """
 }
 

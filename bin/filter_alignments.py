@@ -101,6 +101,7 @@ def has_no_substitutions(cigar_tuples: list[tuple[int, int]]) -> bool:
     Returns:
         bool: True if no 'X' operations are present, False otherwise.
     """
+    # return whether all CIGAR operators do *not* equal the substitution operator, 8.
     substitution_code = 8
     return all(op != substitution_code for op, _ in cigar_tuples)
 
@@ -143,10 +144,21 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
             filtered_tally += 1
             continue
 
-        # Ensure no substitutions ('X' operations) in CIGAR
-        if not has_no_substitutions(read.cigartuples):
-            filtered_tally += 1
-            continue
+        # Previously, we had a filter here that did away with any reads with substitutions
+        # relative to the reference. While this worked well for PacBio HiFi read, it did
+        # away with most Nanopore reads, even with r10 chemistry and super-accuracy
+        # basecalling. As such, we've removed the filter for now, though it may be
+        # re-introduced with tweaks in the future. Here's what the filter implementation
+        # looked like:
+        #
+        # ```python
+        #
+        # # Ensure no substitutions ('X' operations) in CIGAR
+        # if not has_no_substitutions(read.cigartuples):
+        #     filtered_tally += 1          # noqa: ERA001
+        #     continue                     # noqa: ERA001
+        #
+        # ```
 
         # Check if alignment starts at position 1 (0-based)
         if read.reference_start != 0:
