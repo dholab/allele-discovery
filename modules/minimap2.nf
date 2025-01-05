@@ -50,3 +50,28 @@ process GENOTYPE_AMPLICONS {
 
 }
 
+process GENOTYPE_AMPLICON_CLUSTERS {
+
+    tag "${id}"
+
+    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
+    maxRetries 2
+
+    cpus 4
+
+    input:
+    tuple val(id), path(trimmed_fastq), path(genotyping_fasta), path(fasta_idx)
+
+    output:
+    path "${id}.sam"
+
+    script:
+    """
+    minimap2 \
+    ${genotyping_fasta} \
+    ${trimmed_fastq} \
+    -ax map-hifi --eqx -t ${task.cpus} \
+    > ${id}.sam
+    """
+
+}

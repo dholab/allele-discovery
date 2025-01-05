@@ -5,7 +5,7 @@ include {
 } from "../modules/clustalo"
 include { CREATE_GENOTYPING_FASTA   } from "../modules/create_genotyping_fasta"
 include { FAIDX ; CONVERT_TO_BAM ; INDEX_BAM } from "../modules/samtools"
-include { GENOTYPE_AMPLICONS        } from "../modules/minimap2"
+include { GENOTYPE_AMPLICON_CLUSTERS        } from "../modules/minimap2"
 include { FILTER_ALIGNMENTS         } from "../modules/filter_alignments"
 include { REMOVE_HEADERS            } from "../modules/bbmap"
 
@@ -16,7 +16,7 @@ workflow PREPARE_GENOTYPES {
     ch_novel_seqs
     ch_cdna_matches
     ch_mapped_cdna_clusters
-    ch_amplicon_reads
+    ch_amplicon_clusters
 
     main:
 
@@ -55,15 +55,15 @@ workflow PREPARE_GENOTYPES {
         )
     }
 
-    GENOTYPE_AMPLICONS(
-        ch_amplicon_reads.combine(FAIDX.out)
+    GENOTYPE_AMPLICON_CLUSTERS(
+        ch_amplicon_clusters.combine(FAIDX.out)
     )
 
-    FILTER_ALIGNMENTS(
-        GENOTYPE_AMPLICONS.out,
-        MERGE_SEQS_FOR_GENOTYPING.out
-    )
+    // FILTER_ALIGNMENTS(
+    //     GENOTYPE_AMPLICONS.out,
+    //     MERGE_SEQS_FOR_GENOTYPING.out
+    // )
 
     emit:
-    FILTER_ALIGNMENTS.out
+    GENOTYPE_AMPLICON_CLUSTERS.out
 }

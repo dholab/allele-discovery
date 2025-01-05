@@ -34,8 +34,9 @@ with open(OUTPUT_NAME, "w", newline="") as genotyping_csv:
     writer.writerow(["animal", "genotype"])
 
     for sam_file in sam_files:
-        # Get sample name by removing the .sam extension
-        sam_file_basename = Path(sam_file).name.replace(".noheaders", "")
+        # Get sample name by removing .sam and any other extensions. This method assumes
+        # that the sample name is the first item in a period-delimited file name.
+        sam_file_basename = Path(sam_file).name.split(".")[0]
         animal_name = re.sub(r"\.sam$", "", sam_file_basename)
 
         with open(sam_file) as tsvfile:

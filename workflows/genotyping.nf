@@ -5,7 +5,7 @@ workflow GENOTYPING {
     take:
     ch_gdna_ref
     ch_allele_clusters
-    ch_amplicon_reads
+    ch_amplicon_clusters
     ch_mapped_cdna_clusters
     ch_novel_seqs
     ch_cdna_matches
@@ -18,7 +18,7 @@ workflow GENOTYPING {
         ch_novel_seqs,
         ch_cdna_matches,
         ch_mapped_cdna_clusters,
-        ch_amplicon_reads
+        ch_amplicon_clusters
     )
 
     GENOTYPE_REPORTING(
