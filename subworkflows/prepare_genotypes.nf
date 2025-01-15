@@ -59,11 +59,11 @@ workflow PREPARE_GENOTYPES {
         ch_amplicon_clusters.combine(FAIDX.out)
     )
 
-    // FILTER_ALIGNMENTS(
-    //     GENOTYPE_AMPLICONS.out,
-    //     MERGE_SEQS_FOR_GENOTYPING.out
-    // )
+    FILTER_ALIGNMENTS(
+        GENOTYPE_AMPLICONS.out,
+        MERGE_SEQS_FOR_GENOTYPING.out
+    )
 
     emit:
-    GENOTYPE_AMPLICON_CLUSTERS.out
+    FILTER_ALIGNMENTS.out
 }

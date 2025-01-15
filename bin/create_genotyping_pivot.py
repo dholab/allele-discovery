@@ -97,7 +97,7 @@ def parse_record_id(record_id: str, ref_id: str) -> SampleRefCount:
         logger.error(
             f"Unable to cast {read_count_split[1]} as an integer, indicating that the input FASTA does not have the expected format: {error}",
         )
-    read_count = int(read_count_split[0])
+    read_count = int(read_count_split[1])
 
     # parse sample Id from the record
     underscore_split = record_id.split("_")
@@ -244,16 +244,25 @@ def pivot_genotypes(long_df: pl.DataFrame) -> pl.DataFrame:
     """
     return (
         long_df.group_by(["sample", "genotype"])  # noqa: PD010
-        .agg(pl.count("support").alias("support"))
+        .agg(pl.sum("support").alias("support"))
         .pivot(on="sample", index="genotype", values="support")
+        .sort("genotype")
     )
 
 
 def main() -> None:
+    # collect SAM files available for genotyping
     sam_files = [str(path) for path in Path.cwd().glob("*.sam")]
+
+    # count the number of reads supporting clusters matching each genotype
     long_df = count_genotypes(sam_files)
+
+    # Pivot the long dataframe so that rows are genotypes and columns are samples
     pivot_table = pivot_genotypes(long_df)
-    pivot_table.write_excel("genotyping_report.xlsx")
+
+    # sort columns before writing out
+    column_order = [pivot_table.columns[0], *sorted(pivot_table.columns[1:])]
+    pivot_table.select(column_order).write_excel("genotyping_report.xlsx")
 
 
 if __name__ == "__main__":
