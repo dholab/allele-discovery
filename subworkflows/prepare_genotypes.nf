@@ -60,7 +60,7 @@ workflow PREPARE_GENOTYPES {
     )
 
     FILTER_ALIGNMENTS(
-        GENOTYPE_AMPLICONS.out,
+        GENOTYPE_AMPLICON_CLUSTERS.out,
         MERGE_SEQS_FOR_GENOTYPING.out
     )
 
