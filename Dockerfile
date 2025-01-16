@@ -1,66 +1,55 @@
-# Use miniconda as a parent image
-# dockerreg.chtc.wisc.edu/dhoconno/pacbio-pbaa:25837
-FROM continuumio/miniconda3
+FROM ubuntu:20.04
 
-# update conda
-RUN conda update -n base -c defaults conda
+# Set working directory
+WORKDIR /scratch
 
-# install mamba
-RUN conda install mamba=0.13.0 -n base -c conda-forge
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/New_York
+ENV HOME=/home
 
-# install tools needed for gdna amplicon allele discovery workflow
-RUN mamba install -y -c conda-forge -c bioconda snakemake=6.4.0 
-RUN mamba install -y -c conda-forge -c bioconda bbmap=38.90
-RUN mamba install -y -c conda-forge -c bioconda vsearch=2.17.0
-RUN mamba install -y -c conda-forge -c bioconda samtools=1.12
-RUN mamba install -y -c conda-forge -c bioconda biopython=1.78
-RUN mamba install -y -c conda-forge -c bioconda pandas=1.2.4
-RUN mamba install -y -c conda-forge -c bioconda pysam=0.16.0.1
-RUN mamba install -y -c conda-forge -c bioconda minimap2=2.20
-RUN mamba install -y -c conda-forge -c bioconda pigz=2.3.4
-RUN mamba install -y -c conda-forge -c bioconda unzip=6.0
-RUN mamba install -y -c conda-forge -c bioconda picard=2.23.9
-RUN mamba install -y -c conda-forge -c bioconda exonerate=2.4.0
-RUN mamba install -y -c conda-forge -c bioconda muscle=3.8.1551
-RUN mamba install -y -c conda-forge -c bioconda pyfasta=0.5.2
-RUN mamba install -y -c conda-forge -c bioconda gffread=0.12.1
-RUN mamba install -y -c conda-forge -c bioconda ipython=7.19.0
-RUN mamba install -y -c conda-forge -c bioconda openpyxl=3.0.5
-RUN mamba install -y -c conda-forge -c bioconda clustalo=1.2.4
+# Set default entrypoint for the build to be the bash shell
+ENTRYPOINT ["bash"]
 
-# install tools needed for demultiplexing PacBio CCS and making clusters
-# pbaa does not work with python 3
-# install miniconda v2
-RUN wget https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh -O ~/miniconda.sh
-RUN bash ~/miniconda.sh -b -p /miniconda2
+# Install a few ubuntu dependencies
+RUN apt-get update && \
+    apt install --fix-broken && \
+    apt-get install -y \
+    build-essential \
+    curl \
+    wget \
+    make \
+    gcc \
+    cmake \
+    libxml2-dev \
+    libxslt-dev \
+    libffi-dev \
+    git && \
+    apt install --fix-broken && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir /dependencies && \
+    dpkg -l > /dependencies/apt-get.lock
 
-# install lima and pbaa
-RUN /miniconda2/bin/conda install -y -c bioconda lima=2.0.0 
-RUN /miniconda2/bin/conda install -y -c bioconda pbaa=1.0.1
+# Install everything else with Pixi:
+# --------------------------------
+# 1) copy the required dependency and configuration file into the image
+COPY pyproject.toml $HOME/pyproject.toml
+COPY pixi.lock $HOME/pixi.lock
 
-# install reference sequences used for read mapping
-# MHC class I
-# aligned HLA-A, HLA-B, HLA-C, HLA-E with MUSCLE and saved open reading frames plus 20bp flanking sequence
-COPY ref/HLA-A-B-C-E-20bp-pad.fasta /ref/HLA-A-B-C-E-20bp-pad.fasta
+# 2) install pixi
+RUN cd $HOME && PIXI_ARCH=x86_64 curl -fsSL https://pixi.sh/install.sh | bash
 
-# add script to convert SAM file to use 'D' instead of 'N' for introns
-# preserves compatibility with Geneious
-COPY scripts/fix-cigar.awk /scripts/fix-cigar.awk
+# 3) make sure pixi and pixi installs are on the $PATH
+ENV PATH=$PATH:$HOME/.pixi/bin
 
-# install files necessary for exonerate processing to Geneious-compatible GFF
-COPY scripts/21295-exonerate_gff_to_alignment_gff3.pl /scripts/21295-exonerate_gff_to_alignment_gff3.pl
-COPY scripts/process-gff.sh /scripts/process-gff.sh
+# 4) install everything else with pixi
+RUN cd $HOME && pixi install --verbose --color=always --frozen && pixi clean cache --assume-yes
 
-# install HLA cDNA and annotation files for exonerate
-# the annotation file is used to define where the CDS is located
-# ONE
-COPY ref/HLA-A-mRNA.fasta /ref/HLA-A-mRNA.fasta
-COPY ref/HLA-A-mRNA-annotation.txt /ref/HLA-A-mRNA-annotation.txt
+# 5) modify the shell config so that each container launches within the pixi env
+RUN echo "export PATH=$PATH:$HOME/.pixi/envs/default/bin" >> $HOME/.bashrc
 
-# install FASTA guide file and index used by pbaa
-COPY ref/24923-vsearch-07-mhc-I.fasta /ref/24923-vsearch-07-mhc-I.fasta
-COPY ref/24923-vsearch-07-mhc-I.fasta.fai /ref/24923-vsearch-07-mhc-I.fasta.fai
+# 6) modify some nextflow environment variables
+RUN echo "export NXF_CACHE_DIR=/scratch" >> $HOME/.bashrc
+RUN echo "export NXF_HOME=/scratch" >> $HOME/.bashrc
 
-# install June 2021 IPD rhesus MHC sequences for annotation
-COPY ref/ipd-mhc-mamu-2021-07-09.gdna.fasta /ref/ipd-mhc-mamu-2021-07-09.gdna.fasta
-COPY ref/ipd-mhc-mamu-2021-07-09.cdna.fasta /ref/ipd-mhc-mamu-2021-07-09.cdna.fasta

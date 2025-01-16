@@ -1,9 +1,10 @@
 [project]
 name = "allele-discovery"
-description = "A bioinformatic pipeline for discovering and genotyping with novel alleles from long, accurate amplicons."
+description = "A bioinformatics pipeline for discovering and genotyping with novel alleles from long, accurate amplicons."
 authors = [
   { name = "David H. O'Connor", email = "dhoconno@wisc.edu" },
   { name = "Nicholas R. Minor", email = "nrminor@wisc.edu" },
+  { name = "Annabelle Kalweit", email = "akalweit@wisc.edu" },
 ]
 dependencies = [
   "loguru>=0.7.2",
