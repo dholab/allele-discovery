@@ -71,6 +71,7 @@ process GENOTYPE_AMPLICON_CLUSTERS {
     ${genotyping_fasta} \
     ${trimmed_fastq} \
     -ax map-hifi --eqx -t ${task.cpus} \
+    --secondary=no --sam-hit-only \
     > ${id}.sam
     """
 
