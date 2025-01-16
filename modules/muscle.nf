@@ -30,38 +30,3 @@ process MAP_CLUSTERS_TO_CDNA {
     """
 }
 
-process COLLECT_INTERMEDIATE_BATCHES {
-    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-    maxRetries 2
-
-    input:
-    path all_files_list, stageAs: "unmerged/*"
-
-    output:
-    path "merged.aln"
-
-    script:
-    """
-    
-    echo "Staged ${all_files_list.size()} files..."
-    cat unmerged/*.aln > merged.aln
-    """
-}
-
-process COLLECT_FINAL_BATCHES {
-    errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-    maxRetries 2
-
-    input:
-    path all_files_list, stageAs: "unmerged/???.aln"
-
-    output:
-    path "merged.aln"
-
-    script:
-    """
-    
-    echo "Staged ${all_files_list.size()} files..."
-    cat unmerged/*.aln > merged.aln
-    """
-}

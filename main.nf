@@ -105,7 +105,7 @@ workflow {
     GENOTYPING (
         ch_gdna_ref,
         PREPROCESSING.out.clusters_fasta,
-        PREPROCESSING.out.amplicon_reads,
+        PREPROCESSING.out.amplicon_clusters,
         ALLELE_DISCOVERY.out.mapped_cdna_clusters,
         ALLELE_DISCOVERY.out.novel_seqs,
         ALLELE_DISCOVERY.out.cdna_matches

@@ -32,7 +32,7 @@ workflow PREPROCESSING {
     )
 
     emit:
-    amplicon_reads = ENRICH_AMPLICONS.out.all_amplicons
-    clusters_fasta = CLUSTERING.out
+    amplicon_clusters = CLUSTERING.out.per_sample_clusters
+    clusters_fasta = CLUSTERING.out.merged_clusters
     indexed_guide  = PREPARE_SEQUENCE_FILES.out.indexed_guide
 }

@@ -144,21 +144,10 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
             filtered_tally += 1
             continue
 
-        # Previously, we had a filter here that did away with any reads with substitutions
-        # relative to the reference. While this worked well for PacBio HiFi read, it did
-        # away with most Nanopore reads, even with r10 chemistry and super-accuracy
-        # basecalling. As such, we've removed the filter for now, though it may be
-        # re-introduced with tweaks in the future. Here's what the filter implementation
-        # looked like:
-        #
-        # ```python
-        #
-        # # Ensure no substitutions ('X' operations) in CIGAR
-        # if not has_no_substitutions(read.cigartuples):
-        #     filtered_tally += 1          # noqa: ERA001
-        #     continue                     # noqa: ERA001
-        #
-        # ```
+        # Ensure no substitutions ('X' operations) in CIGAR
+        if not has_no_substitutions(read.cigartuples):
+            filtered_tally += 1
+            continue
 
         # Check if alignment starts at position 1 (0-based)
         if read.reference_start != 0:

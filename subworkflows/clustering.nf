@@ -49,5 +49,6 @@ workflow CLUSTERING {
     )
 
     emit:
-    RENAME_PUTATIVE_ALLELE_CLUSTERS.out
+    per_sample_clusters = RENAME_CLUSTERS_WITH_IDS.out
+    merged_clusters = RENAME_PUTATIVE_ALLELE_CLUSTERS.out
 }

@@ -1,8 +1,4 @@
-include {
-    MAP_CLUSTERS_TO_CDNA ;
-    COLLECT_INTERMEDIATE_BATCHES ;
-    COLLECT_FINAL_BATCHES
-} from "../modules/muscle"
+include { MAP_CLUSTERS_TO_CDNA      } from "../modules/muscle"
 include { FIND_CDNA_GDNA_MATCHES    } from "../modules/awk"
 include { RENAME_CDNA_MATCHED_FASTA } from "../modules/rename_cdna_matched"
 include { EXTRACT_NOVEL_SEQUENCES   } from "../modules/bbmap"
@@ -33,16 +29,9 @@ workflow CDNA_PROCESSING {
             }
         )
 
-        COLLECT_INTERMEDIATE_BATCHES(
-            MAP_CLUSTERS_TO_CDNA.out.buffer(size: 1000, remainder: true)
-        )
-
-        COLLECT_FINAL_BATCHES(
-            COLLECT_INTERMEDIATE_BATCHES.out.collect()
-        )
-
         FIND_CDNA_GDNA_MATCHES(
-            COLLECT_FINAL_BATCHES.out
+            MAP_CLUSTERS_TO_CDNA.out
+                .collectFile(name: "collected.aln") { file -> file.text }
         )
 
         RENAME_CDNA_MATCHED_FASTA(
