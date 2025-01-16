@@ -14,7 +14,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -173,10 +172,18 @@ reads/
 fastq/
 fastqs/
 ._*
-uv.lock
 .snakemake
 logs
 .DS_Store
 ._*
 results
 data
+.nextflow/
+work/
+inputs/
+scratch/
+data/
+fastqs/
+sandbox/
+results/
+.nextflow.log*
