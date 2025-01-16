@@ -79,16 +79,16 @@ def parse_record_id(record_id: str, ref_id: str) -> SampleRefCount:
         ValueError: If the read count cannot be cast as an integer
     """
     # make sure the expected read count delimiter is present in the input record
-    assert (
-        READ_COUNT_DELIM in record_id
-    ), f"The provided record ID, {record_id} does not contain an '{READ_COUNT_DELIM}' delimiter, and thus can't be parsed properly. Aborting."
+    assert READ_COUNT_DELIM in record_id, (
+        f"The provided record ID, {record_id} does not contain an '{READ_COUNT_DELIM}' delimiter, and thus can't be parsed properly. Aborting."
+    )
 
     # split out the final element after the read count delimiter, which *should* be the read count
     read_count_split = record_id.split(READ_COUNT_DELIM)
     expected_splits = 2
-    assert (
-        len(read_count_split) == expected_splits
-    ), f"Splitting of {record_id} on {READ_COUNT_DELIM} yielded more than the expected two results, indicating that the cluster FASTA is corrupted:\n{read_count_split}"
+    assert len(read_count_split) == expected_splits, (
+        f"Splitting of {record_id} on {READ_COUNT_DELIM} yielded more than the expected two results, indicating that the cluster FASTA is corrupted:\n{read_count_split}"
+    )
 
     # make sure the read count is an integer
     try:
@@ -101,9 +101,9 @@ def parse_record_id(record_id: str, ref_id: str) -> SampleRefCount:
 
     # parse sample Id from the record
     underscore_split = record_id.split("_")
-    assert (
-        len(underscore_split) > 1
-    ), f"Unable to properly split the Record ID {record_id} by underscores to find the sample ID: {underscore_split}"
+    assert len(underscore_split) > 1, (
+        f"Unable to properly split the Record ID {record_id} by underscores to find the sample ID: {underscore_split}"
+    )
     sample_id = clean_sample_name(underscore_split[0])
 
     return SampleRefCount(
@@ -243,7 +243,7 @@ def pivot_genotypes(long_df: pl.DataFrame) -> pl.DataFrame:
         pl.DataFrame: A wider format DataFrame with genotypes as rows and samples as columns
     """
     return (
-        long_df.group_by(["sample", "genotype"])  # noqa: PD010
+        long_df.group_by(["sample", "genotype"])
         .agg(pl.sum("support").alias("support"))
         .pivot(on="sample", index="genotype", values="support")
         .sort("genotype")
