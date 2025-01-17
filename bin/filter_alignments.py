@@ -86,9 +86,16 @@ def is_soft_clipping_only_at_ends(cigar_tuples: list[tuple[int, int]]) -> bool:
     if not cigar_tuples:
         return False
 
-    num_ops = len(cigar_tuples)
+    # Count how many soft clipping operations we find
     soft_clip_op = 4
-    return all(not (op == soft_clip_op and idx != 0 and idx != num_ops - 1) for idx, (op, _) in enumerate(cigar_tuples))
+    soft_clip_positions = [idx for idx, (op, _) in enumerate(cigar_tuples) if op == soft_clip_op]
+
+    # If no soft clipping at all, return True
+    if not soft_clip_positions:
+        return True
+
+    # Check if all soft clipping positions are at the ends
+    return all(pos == 0 or pos == len(cigar_tuples) - 1 for pos in soft_clip_positions)
 
 
 def has_no_substitutions(cigar_tuples: list[tuple[int, int]]) -> bool:
@@ -139,7 +146,6 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
         if read.cigartuples is None:
             filtered_tally += 1
             continue
-
         if not is_soft_clipping_only_at_ends(read.cigartuples):
             filtered_tally += 1
             continue
