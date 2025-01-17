@@ -10,9 +10,20 @@ from __future__ import annotations
 
 import argparse
 import sys
+from dataclasses import dataclass
 
 import pysam
 from loguru import logger
+
+
+@dataclass
+class FilterCauses:
+    """ """
+
+    unmapped: int = 0
+    subs: int = 0
+    internal_soft_clips: int = 0
+    shorter_than_ref: int = 0
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -134,37 +145,41 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
     # Open output SAM (copy header from input)
     outfile = pysam.AlignmentFile(output_sam, "w", header=samfile.header)
 
-    filtered_tally = 0
+    # initialize a dictionary to store the reasons for each filter
+    filtered_tallies = FilterCauses()
+    read_count = 0
     retained_tally = 0
     for read in samfile.fetch(until_eof=True):
+        # incrememt read count
+        read_count += 1
+
         # Skip unmapped reads
         if read.is_unmapped:
-            filtered_tally += 1
+            filtered_tallies.unmapped += 0
             continue
 
         # Check for soft clipping only at the ends in CIGAR
         if read.cigartuples is None:
-            filtered_tally += 1
+            filtered_tallies.internal_soft_clips += 1
             continue
         if not is_soft_clipping_only_at_ends(read.cigartuples):
-            filtered_tally += 1
+            filtered_tallies.internal_soft_clips += 1
             continue
 
         # Ensure no substitutions ('X' operations) in CIGAR
         if not has_no_substitutions(read.cigartuples):
-            filtered_tally += 1
+            filtered_tallies.subs += 1
             continue
 
         # Check if alignment starts at position 1 (0-based)
         if read.reference_start != 0:
-            filtered_tally += 1
+            filtered_tallies.shorter_than_ref += 1
             continue
 
         # Calculate alignment length (sum of M, =, X operations)
         aln_length = 0
         for op, length in read.cigartuples:
             if op not in [0, 7, 8]:  # M, =, X
-                filtered_tally += 1
                 continue
             aln_length += length
 
@@ -173,21 +188,29 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
         ref_length = ref_lengths.get(str(ref_name))
         if ref_length is None:
             # Reference name not found in reference lengths
-            filtered_tally += 1
             continue
 
         # Check if alignment spans the entire reference
-        if aln_length == ref_length:
-            retained_tally += 1
-            outfile.write(read)
+        if aln_length != ref_length:
+            filtered_tallies.shorter_than_ref += 1
+            continue
+
+        retained_tally += 1
+        outfile.write(read)
 
     # Close files
     samfile.close()
     outfile.close()
 
+    # create a tally of the number of reads filtered
+    filtered_tally = read_count - retained_tally
+
     # log out the results
     logger.info(
         f"Filtered {filtered_tally} reads from the input reads, leaving {retained_tally} behind. In all, {(filtered_tally / (filtered_tally + retained_tally)) * 100}% of reads were filtered and will thus not be included in the final genotyping report.",
+    )
+    logger.info(
+        f"{filtered_tallies.unmapped} reads were filtered because they were unmapped. {filtered_tallies.subs} were filtered because they had substitutions relative to a reference. {filtered_tallies.internal_soft_clips} were filtered because they had soft clips internal to the alignment. {filtered_tallies.shorter_than_ref} were filtered because they are shorter than the reference.",
     )
 
 
