@@ -155,7 +155,7 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
 
         # Skip unmapped reads
         if read.is_unmapped:
-            filtered_tallies.unmapped += 0
+            filtered_tallies.unmapped += 1
             continue
 
         # Check for soft clipping only at the ends in CIGAR
