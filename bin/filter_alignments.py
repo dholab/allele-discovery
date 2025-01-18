@@ -24,6 +24,7 @@ class FilterCauses:
     subs: int = 0
     internal_soft_clips: int = 0
     shorter_than_ref: int = 0
+    ref_not_in_fasta: int = 0
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -57,7 +58,7 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_reference_lengths(reference_fasta: str) -> dict[str, str]:
+def load_reference_lengths(reference_fasta: str) -> dict[str, int]:
     """
     Load reference sequence lengths from the .fai index file.
 
@@ -124,6 +125,46 @@ def has_no_substitutions(cigar_tuples: list[tuple[int, int]]) -> bool:
     return all(op != substitution_code for op, _ in cigar_tuples)
 
 
+def log_filtering_stats(
+    read_count: int,
+    retained_tally: int,
+    filter_causes: FilterCauses,
+    reference_name: str,
+) -> None:
+    """
+    Log statistics about the filtering process.
+
+    Args:
+        read_count (int): Total number of reads processed.
+        retained_tally (int): Number of reads retained after filtering.
+        filter_causes (FilterCauses): Object containing counts of different filter causes.
+        reference_name (str): Path to reference FASTA file.
+    """
+    # create a tally of the number of reads filtered
+    filtered_tally = read_count - retained_tally
+
+    # log out the results
+    logger.info(
+        f"Filtered {filtered_tally} reads from the input reads, leaving {retained_tally} behind. In all, {(filtered_tally / (filtered_tally + retained_tally)) * 100}% of reads were filtered and will thus not be included in the final genotyping report.",
+    )
+    logger.info("Proceeding to filtering statistics:")
+    logger.info(
+        f"{filter_causes.unmapped} reads were filtered because they were unmapped.",
+    )
+    logger.info(
+        f"{filter_causes.subs} were filtered because they had substitutions relative to a reference.",
+    )
+    logger.info(
+        f"{filter_causes.internal_soft_clips} were filtered because they had soft clips internal to the alignment.",
+    )
+    logger.info(
+        f"{filter_causes.ref_not_in_fasta} reads were filtered because the reference they were mapped to does not have an identifier that matches a reference in {reference_name}.",
+    )
+    logger.info(
+        f"{filter_causes.shorter_than_ref} were filtered because they are shorter than the reference.",
+    )
+
+
 def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> None:  # noqa: C901
     """
     Filter alignments based on the specified criteria and write to output SAM.
@@ -188,10 +229,11 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
         ref_length = ref_lengths.get(str(ref_name))
         if ref_length is None:
             # Reference name not found in reference lengths
+            filtered_tallies.ref_not_in_fasta += 1
             continue
 
         # Check if alignment spans the entire reference
-        if aln_length != ref_length:
+        if aln_length < ref_length:
             filtered_tallies.shorter_than_ref += 1
             continue
 
@@ -202,15 +244,12 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
     samfile.close()
     outfile.close()
 
-    # create a tally of the number of reads filtered
-    filtered_tally = read_count - retained_tally
-
-    # log out the results
-    logger.info(
-        f"Filtered {filtered_tally} reads from the input reads, leaving {retained_tally} behind. In all, {(filtered_tally / (filtered_tally + retained_tally)) * 100}% of reads were filtered and will thus not be included in the final genotyping report.",
-    )
-    logger.info(
-        f"{filtered_tallies.unmapped} reads were filtered because they were unmapped. {filtered_tallies.subs} were filtered because they had substitutions relative to a reference. {filtered_tallies.internal_soft_clips} were filtered because they had soft clips internal to the alignment. {filtered_tallies.shorter_than_ref} were filtered because they are shorter than the reference.",
+    # log out how much filtering occurred along with information on why filtering occurred
+    log_filtering_stats(
+        read_count,
+        retained_tally,
+        filtered_tallies,
+        reference_fasta,
     )
 
 
