@@ -194,6 +194,9 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
         # incrememt read count
         read_count += 1
 
+        # Flag to track if the read passes all filters
+        is_read_retained = True
+
         # Skip unmapped reads
         if read.is_unmapped:
             filtered_tallies.unmapped += 1
@@ -230,19 +233,32 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
         if ref_length is None:
             # Reference name not found in reference lengths
             filtered_tallies.ref_not_in_fasta += 1
+            is_read_retained = False
             continue
 
         # Check if alignment spans the entire reference
         if aln_length < ref_length:
             filtered_tallies.shorter_than_ref += 1
+            is_read_retained = False
             continue
 
-        retained_tally += 1
-        outfile.write(read)
+        if is_read_retained:
+            retained_tally += 1
+            outfile.write(read)
 
     # Close files
     samfile.close()
     outfile.close()
+
+    # Verify that all reads are accounted for
+    assert read_count == (
+        filtered_tallies.unmapped
+        + filtered_tallies.internal_soft_clips
+        + filtered_tallies.subs
+        + filtered_tallies.shorter_than_ref
+        + filtered_tallies.ref_not_in_fasta
+        + retained_tally
+    ), "Total reads do not match filtered and retained counts"
 
     # log out how much filtering occurred along with information on why filtering occurred
     log_filtering_stats(
