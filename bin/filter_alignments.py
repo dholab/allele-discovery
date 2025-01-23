@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import pysam
 from loguru import logger
@@ -175,11 +176,12 @@ def log_filtering_stats(
 
 
 def write_stats_to_disk(
+    sample_id: str,
     read_count: int,
     retained_tally: int,
     filter_causes: FilterCauses,
 ) -> None:
-    with open("stats.txt") as stats_handle:
+    with open(f"{sample_id}_stats.txt", "w") as stats_handle:
         stats_handle.write(f"Total number of input reads: {read_count}\n")
         stats_handle.write(f"Number of reads that passed filtering: {retained_tally}\n")
         stats_handle.write(f"Number of reads filtered because they were unmapped: {filter_causes.unmapped}\n")
@@ -309,7 +311,8 @@ def filter_alignments(  # noqa: C901, PLR0912, PLR0915
         return
 
     # write out filtering stats
-    write_stats_to_disk(read_count, retained_tally, filtered_tallies)
+    sample_id = str(Path(input_sam).name).replace(".bam", "").replace(".sam", "")
+    write_stats_to_disk(sample_id, read_count, retained_tally, filtered_tallies)
 
 
 def main() -> None:
