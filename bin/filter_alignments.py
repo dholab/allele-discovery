@@ -3,6 +3,7 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "pysam",
+#     "loguru"
 # ]
 # ///
 
@@ -54,6 +55,14 @@ def parse_arguments() -> argparse.Namespace:
         "--output_sam",
         required=True,
         help="Output filtered SAM file",
+    )
+    parser.add_argument(
+        "-s",
+        "--stats",
+        action="store_true",
+        required=False,
+        default=False,
+        help="Whether to output a text file of filtering statistics.",
     )
     return parser.parse_args()
 
@@ -165,7 +174,35 @@ def log_filtering_stats(
     )
 
 
-def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> None:  # noqa: C901
+def write_stats_to_disk(
+    read_count: int,
+    retained_tally: int,
+    filter_causes: FilterCauses,
+) -> None:
+    with open("stats.txt") as stats_handle:
+        stats_handle.write(f"Total number of input reads: {read_count}\n")
+        stats_handle.write(f"Number of reads that passed filtering: {retained_tally}\n")
+        stats_handle.write(f"Number of reads filtered because they were unmapped: {filter_causes.unmapped}\n")
+        stats_handle.write(
+            f"Number of reads filtered because they contained substitutions relative to their reference: {filter_causes.subs}\n",
+        )
+        stats_handle.write(
+            f"Number of reads filtered because they contained internal/non-terminal soft-clipping: {filter_causes.internal_soft_clips}\n",
+        )
+        stats_handle.write(
+            f"Number of reads filtered because their listed reference was not in the provided FASTA: {filter_causes.ref_not_in_fasta}\n",
+        )
+        stats_handle.write(
+            f"Number of reads filtered because they were shorter than the reference they were mapped to: {filter_causes.shorter_than_ref}\n",
+        )
+
+
+def filter_alignments(  # noqa: C901, PLR0912, PLR0915
+    input_sam: str,
+    reference_fasta: str,
+    output_sam: str,
+    stats: bool,  # noqa: FBT001
+) -> None:
     """
     Filter alignments based on the specified criteria and write to output SAM.
 
@@ -268,10 +305,16 @@ def filter_alignments(input_sam: str, reference_fasta: str, output_sam: str) -> 
         reference_fasta,
     )
 
+    if not stats:
+        return
+
+    # write out filtering stats
+    write_stats_to_disk(read_count, retained_tally, filtered_tallies)
+
 
 def main() -> None:
     args = parse_arguments()
-    filter_alignments(args.input_sam, args.reference_fasta, args.output_sam)
+    filter_alignments(args.input_sam, args.reference_fasta, args.output_sam, args.stats)
 
 
 if __name__ == "__main__":

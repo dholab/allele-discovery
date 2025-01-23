@@ -12,7 +12,8 @@ process FILTER_ALIGNMENTS {
     each path(refseq)
 
     output:
-    path "${file_label}.filtered.sam"
+    path "${file_label}.filtered.sam", emit: sam
+    path "*.txt", emit: stats
 
     script:
     file_label = file(sam).getSimpleName()
@@ -21,6 +22,7 @@ process FILTER_ALIGNMENTS {
     filter_alignments.py \
     --input_sam ${sam} \
     --reference_fasta ${refseq} \
-    --output_sam ${file_label}.filtered.sam
+    --output_sam ${file_label}.filtered.sam \
+    --stats
     """
 }

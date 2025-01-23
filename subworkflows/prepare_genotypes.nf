@@ -65,5 +65,5 @@ workflow PREPARE_GENOTYPES {
     )
 
     emit:
-    FILTER_ALIGNMENTS.out
+    FILTER_ALIGNMENTS.out.sam
 }
