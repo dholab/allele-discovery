@@ -29,8 +29,10 @@ allele-discovery = { path = ".", editable = true }
 
 # NOTE:
 # --------------------------------------------------------------------------------------
-# as of 2024-09-12, exonerate and clustalo do not support ARM/Apple Silicon Macs. As
-# such, this pipeline does not yet support ARM macs.
+# as of 2025-01-23, exonerate, clustalo, and picard do not support ARM/Apple Silicon
+# Macs. As such, this pipeline does not yet support ARM macs. PBAA also does not appear
+# to be executable outside of linux, though it's still listed for osx-64 here because
+# it is installable. Use at your own risk.
 # --------------------------------------------------------------------------------------
 
 [tool.pixi.project]
@@ -52,6 +54,7 @@ muscle = ">=5.1,<6"
 vsearch = ">=2.28.1,<3"
 pyfasta = ">=0.5.2,<0.6"
 perl = ">=5.32.1,<6"
+nextflow = ">=24.10.4,<25"
 
 [tool.uv]
 compile-bytecode = true
