@@ -4,7 +4,6 @@ include {
     RENAME_CLUSTERS_WITH_IDS ;
     SHARED_ANIMALS
 } from "../modules/bbmap"
-include { MERGE_ALL_ANIMALS               } from "../modules/seqkit"
 include { RENAME_PUTATIVE_ALLELE_CLUSTERS } from "../modules/rename_cluster_seqs"
 
 
@@ -36,12 +35,10 @@ workflow CLUSTERING {
         DEDUP_CLUSTERS.out
     )
 
-    MERGE_ALL_ANIMALS(
-        RENAME_CLUSTERS_WITH_IDS.out.map { _id, data -> data }.collect()
-    )
-
     SHARED_ANIMALS(
-        MERGE_ALL_ANIMALS.out
+        RENAME_CLUSTERS_WITH_IDS.out
+            .map { _id, data -> data }
+            .collectFile(name: "merged.fasta") { file -> file.text }
     )
 
     RENAME_PUTATIVE_ALLELE_CLUSTERS(

@@ -142,34 +142,6 @@ process MERGE_ALL_AMPLICONS_PER_SAMPLE {
   """
 }
 
-process MERGE_ALL_ANIMALS {
-
-  /* */
-
-  publishDir params.merged_clusters, mode: 'copy', overwrite: true
-
-  errorStrategy { task.attempt < 3 ? 'retry' : 'ignore' }
-  maxRetries 2
-
-  cpus 4
-
-  input:
-  path "per_animal_clusters/*"
-
-  output:
-  path "merged.fasta.gz"
-
-  script:
-  """
-  seqkit scat \
-  --format fasta \
-  --find-only \
-  --threads ${task.cpus} \
-  per_animal_clusters/ \
-  | bgzip -o merged.fasta.gz
-  """
-}
-
 process VALIDATE_NOVEL_SEQUENCES {
   publishDir params.novel_alleles, mode: 'copy', overwrite: true
 
