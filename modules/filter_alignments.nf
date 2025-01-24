@@ -18,10 +18,9 @@ process FILTER_ALIGNMENTS {
     script:
     file_label = file(sam).getSimpleName()
     """
-	samtools faidx ${refseq} && \
     filter_alignments.py \
     --input_sam ${sam} \
-    --reference_fasta ${refseq} \
+    --reference_fasta ${refseq[0]} \
     --output_sam ${file_label}.filtered.sam \
     --stats
     """
