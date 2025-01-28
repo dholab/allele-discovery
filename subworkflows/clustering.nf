@@ -35,15 +35,26 @@ workflow CLUSTERING {
         DEDUP_CLUSTERS.out
     )
 
-    SHARED_ANIMALS(
-        RENAME_CLUSTERS_WITH_IDS.out
-            .map { _id, data -> data }
-            .collectFile(name: "merged.fasta") { file -> file.text }
-    )
+    if ( params.enforce_shared_clusters ) {
+        SHARED_ANIMALS(
+            RENAME_CLUSTERS_WITH_IDS.out
+                .map { _id, data -> data }
+                .collectFile(name: "merged.fasta") { file -> file.text }
+        )
 
-    RENAME_PUTATIVE_ALLELE_CLUSTERS(
-        SHARED_ANIMALS.out
-    )
+        RENAME_PUTATIVE_ALLELE_CLUSTERS(
+            SHARED_ANIMALS.out
+        )
+
+    } else {
+
+        RENAME_PUTATIVE_ALLELE_CLUSTERS(
+            RENAME_CLUSTERS_WITH_IDS.out
+        )
+        
+        
+    }
+
 
     emit:
     per_sample_clusters = RENAME_CLUSTERS_WITH_IDS.out
