@@ -60,7 +60,7 @@ process GENOTYPE_AMPLICON_CLUSTERS {
     cpus 4
 
     input:
-    tuple val(id), path(trimmed_fastq), path(genotyping_fasta), path(fasta_idx)
+    tuple val(id), path(amplicon_cluster), path(genotyping_fasta), path(fasta_idx)
 
     output:
     path "${id}.sam"
@@ -69,7 +69,7 @@ process GENOTYPE_AMPLICON_CLUSTERS {
     """
     minimap2 \
     ${genotyping_fasta} \
-    ${trimmed_fastq} \
+    ${amplicon_cluster} \
     -ax map-hifi --eqx -t ${task.cpus} \
     --secondary=no --sam-hit-only \
     > ${id}.sam
