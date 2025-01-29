@@ -8,8 +8,7 @@ process FILTER_ALIGNMENTS {
     maxRetries 2
 
     input:
-    path sam
-    each path(refseq)
+    tuple path(sam), path(fasta), path(fai)
 
     output:
     path "${file_label}.filtered.sam", emit: sam
@@ -20,7 +19,7 @@ process FILTER_ALIGNMENTS {
     """
     filter_alignments.py \
     --input_sam ${sam} \
-    --reference_fasta ${refseq[0]} \
+    --reference_fasta ${fasta} \
     --output_sam ${file_label}.filtered.sam \
     --stats
     """

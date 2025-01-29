@@ -1,5 +1,5 @@
 
-include { DEDUPLICATE_AMPLICONS; REMOVE_SHORT_READS} from "../modules/bbmap"
+include { REMOVE_SHORT_READS } from "../modules/bbmap"
 include { EXTRACT_TOP_QUALITY } from "../modules/extract_top_quality"
 include { ORIENT_READS } from "../modules/vsearch"
 include { VALIDATE_READS } from "../modules/validate"
@@ -47,12 +47,8 @@ workflow ENRICH_AMPLICONS {
             FIND_COMPLETE_AMPLICONS.out
         )
 
-        DEDUPLICATE_AMPLICONS (
-            TRIM_ENDS_TO_PRIMERS.out
-        )
-
         REMOVE_SHORT_READS (
-            DEDUPLICATE_AMPLICONS.out
+            TRIM_ENDS_TO_PRIMERS.out
         )
 
         AMPLICON_STATS (

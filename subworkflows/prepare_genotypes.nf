@@ -60,8 +60,7 @@ workflow PREPARE_GENOTYPES {
     )
 
     FILTER_ALIGNMENTS(
-        GENOTYPE_AMPLICON_CLUSTERS.out,
-        FAIDX.out
+        GENOTYPE_AMPLICON_CLUSTERS.out.combine(FAIDX.out)
     )
 
     emit:

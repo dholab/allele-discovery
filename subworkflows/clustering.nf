@@ -50,6 +50,7 @@ workflow CLUSTERING {
 
         RENAME_PUTATIVE_ALLELE_CLUSTERS(
             RENAME_CLUSTERS_WITH_IDS.out
+                .map { _id, data -> data }
         )
         
         
