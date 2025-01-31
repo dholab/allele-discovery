@@ -177,7 +177,7 @@ process MERGE_SEQS_FOR_GENOTYPING {
   path "genotyping_seqs/*"
 
   output:
-  path "refs_with_novel.fasta"
+  path "classification.fasta"
 
   script:
   """
@@ -186,6 +186,6 @@ process MERGE_SEQS_FOR_GENOTYPING {
     --find-only \
     --threads ${task.cpus} \
     genotyping_seqs/ \
-    -o refs_with_novel.fasta 
+    -o classification.fasta 
     """
 }
