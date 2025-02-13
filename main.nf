@@ -81,11 +81,13 @@ workflow {
         Channel.fromPath ( params.cdna_reference_fasta ) :
         Channel.empty()
 
-    ch_hla_mrna_ref = Channel
-        .fromPath ( params.hla_mrna_reference )
+    ch_hla_mrna_ref = params.hla_mrna_reference ?
+        Channel.fromPath ( params.hla_mrna_reference ) :
+        Channel.empty()
 
-    ch_hla_cds_annotation = Channel
-        .fromPath ( params.hla_cds_annotation )
+    ch_hla_cds_annotation = params.hla_cds_annotation ?
+        Channel.fromPath ( params.hla_cds_annotation ) :
+        Channel.empty()
 
 
     PREPROCESSING (
@@ -126,3 +128,4 @@ workflow {
     }
 
 }
+
